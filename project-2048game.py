@@ -128,6 +128,7 @@ def play2048():
     while 1:
         if game.countZeros() == 0:
             print("Game over!")
+            return
         game.printScore()
         game.placeRandomTile()
         game.printBoard()
