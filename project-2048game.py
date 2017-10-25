@@ -37,7 +37,9 @@ class game_2048:
                     if count == rand:
                         self.board[row][col] = tileVal
                         return
-
+                    
+    # The swipes are similar, but slight differences make it convenient to keep them separate.
+    # Can gather into one function if necessary.
     def swipeLeft(self):
         for row in range(self.size):
             if sum(self.board[row]) == 0: continue
@@ -51,8 +53,6 @@ class game_2048:
             while len(newRow) < self.size: newRow.append(0)
             self.board[row] = newRow
 
-    # The swipes are similar, but slight differences make it convenient to keep them separate.
-    # Can gather into one function if necessary.
     def swipeRight(self):
         for row in range(self.size):
             if sum(self.board[row]) == 0: continue
