@@ -37,9 +37,7 @@ class game_2048:
                     if count == rand:
                         self.board[row][col] = tileVal
                         return
-                    
-    # The swipes are similar, but slight differences make it convenient to keep them separate.
-    # Can gather into one function if necessary.
+
     def swipeLeft(self):
         for row in range(self.size):
             if sum(self.board[row]) == 0: continue
@@ -53,6 +51,8 @@ class game_2048:
             while len(newRow) < self.size: newRow.append(0)
             self.board[row] = newRow
 
+    # The swipes are similar, but slight differences make it convenient to keep them separate.
+    # Can gather into one function if necessary.
     def swipeRight(self):
         for row in range(self.size):
             if sum(self.board[row]) == 0: continue
@@ -102,10 +102,10 @@ class game_2048:
         swipe = ''
         while swipe not in self.options:
             swipe = raw_input("Please enter a, s, d, w, or quit: ")
+            print('')
         return swipe
 
-    def getMove(self):
-        swipe = self.getInput()
+    def getMove(self, swipe):
         if swipe == 'a':
             self.swipeLeft()
         elif swipe == 's':
@@ -122,18 +122,34 @@ class game_2048:
 
 ############################################################
 
-def play2048():
-    game = game_2048()
+def playNGames2048(n):
+    games = [game_2048() for _ in range(n)]
+    numMoves = 0
+
+    print('Welcome to n-2048!')
+    print('You will be playing %d concurrent games of 2048!' % n)
+    print('Game over when one of the %d boards reaches an end state, i.e. all spaces are filled.' % n)
+    print('Score is determined by average score over the %d boards at the end.' % n)
+    print('')
 
     while 1:
-        if game.countZeros() == 0:
-            print("Game over!")
-            return
-        game.printScore()
-        game.placeRandomTile()
-        game.printBoard()
-        game.getMove()
+        for k in range(n):
+            if games[k].countZeros() == 0:
+                print('Game over at board %d!' % k)
+                games[k].printBoard()
+                score = sum(games[_].score for _ in range(n))
+                print('Your score is %2.f!' % (score / float(n)))
+                print('Your number of moves is %d' % numMoves)
+                return
+        for k in range(n):
+            games[k].placeRandomTile()
+            games[k].printBoard()
+        swipe = games[0].getInput()
+        for k in range(n):
+            games[k].getMove(swipe)
+        numMoves += 1
+
 
 ############################################################
 
-play2048()
+playNGames2048(4)
