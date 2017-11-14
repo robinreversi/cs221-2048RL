@@ -38,16 +38,11 @@ class Game_2048:
     ----------------------
     ''' 
     def placeRandomTile(self):
-        rand = random.randint(1, self.countZeros())
+        empty_pos = [(row, col) for row in range(self.size) for col in range(self.size)\
+                     if self.grid[row][col] == 0]
         tileVal = 2 * random.randint(1, 2)
-        count = 0
-        for row in range(self.size):
-            for col in range(self.size):
-                if self.board[row][col] == 0:
-                    count += 1
-                    if count == rand:
-                        self.board[row][col] = tileVal
-                        return
+        row, col = random.sample(empty_pos)
+        self.board[row][col] = tileVal
 
     def swipeLeft(self):
         for row in range(self.size):
@@ -160,6 +155,7 @@ class Game_2048:
 
     def copy(self):
         return copy.deepcopy(self)
+
     # TODO: definitely need to convert this to a real get legal actions fn
     # playerIndex will be 0 or 1 depending on whether the player is
     # swiping (0) or the computer is putting a random move
@@ -173,7 +169,7 @@ class Game_2048:
 ############################################################
 
 def playNGames2048(n):
-    games = [game_2048() for _ in range(n)]
+    games = [Game_2048() for _ in range(n)]
     numMoves = 0
 
     print('Welcome to n-2048!')
