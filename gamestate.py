@@ -173,7 +173,7 @@ class Game_2048:
 ############################################################
 
 def playNGames2048(n):
-    games = [game_2048() for _ in range(n)]
+    games = [Game_2048() for _ in range(n)]
     numMoves = 0
 
     print('Welcome to n-2048!')
