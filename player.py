@@ -15,7 +15,7 @@ class ExpectimaxAgent():
     def V(agentIndex, numAgents, gameState, depth, evalFn):
         agentIndex = agentIndex % numAgents
         legalMoves = gameState.getLegalActions(agentIndex)
-        if(gameState.isWin() or gameState.isLose() or len(legalMoves) == 0):
+        if(gameState.isEnd()):
             return (gameState.getScore(), Directions.STOP)
         elif(depth == 0):
             return (evalFn(gameState), random.choice(legalMoves))

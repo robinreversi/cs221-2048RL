@@ -152,9 +152,15 @@ class game_2048:
         else:
             self.swipeDown()
 
-    # definitely need to convert this to a real get legal actions fn
-    def getLegalActions(self):
-        return ['a', 'w', 'd', 's']
+    # TODO: definitely need to convert this to a real get legal actions fn
+    # playerIndex will be 0 or 1 depending on whether the player is
+    # swiping (0) or the computer is putting a random move
+    def getLegalActions(self, playerIndex):
+        if(playerIndex == 0):
+            return ['a', 'w', 'd', 's']
+        else:
+            return [(i, j) for i in range(self.size) for j in range(self.size)\
+                    if self.board[i][j] == 0]
 
 ############################################################
 
