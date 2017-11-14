@@ -1,8 +1,9 @@
 import collections, random
 import numpy as np
+import copy
 ############################################################
 
-class game_2048:
+class Game_2048:
     '''
     Creates a game of 2048.
     Access self.board in the same way as a matrix, i.e. self.board[row][col].
@@ -142,16 +143,23 @@ class game_2048:
     def isEnd(self):
         return self.countZeros() == 0
 
-    def generateSuccessor(self, action):
-        if(action == 'a'):
-            self.swipeLeft()
-        elif(action == 'w'):
-            self.swipeUp()
-        elif(action == 'd'):
-            self.swipeRight()
+    def generateSuccessor(self, agentIndex, action):
+        copy = self.copy(self)
+        if(agentIndex == 0):
+            if(action == 'a'):
+                copy.swipeLeft()
+            elif(action == 'w'):
+                copy.swipeUp()
+            elif(action == 'd'):
+                copy.swipeRight()
+            else:
+                copy.swipeDown()
         else:
-            self.swipeDown()
+            copy.placeRandomTile()
+        return copy
 
+    def copy(self):
+        return copy.deepcopy(self)
     # TODO: definitely need to convert this to a real get legal actions fn
     # playerIndex will be 0 or 1 depending on whether the player is
     # swiping (0) or the computer is putting a random move

@@ -1,7 +1,6 @@
-class ExpectimaxAgent():
-  """
-    Your expectimax agent (problem 3)
-  """
+import random
+
+class Player():
 
   def getAction(self, gameState):
     """
