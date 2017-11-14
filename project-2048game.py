@@ -1,5 +1,5 @@
 import collections, random
-
+import numpy as np
 ############################################################
 
 class game_2048:
@@ -11,10 +11,15 @@ class game_2048:
 
     def __init__(self):
         self.size = 4
-        self.board = [[0 for _ in range(self.size)] for _ in range(self.size)]
+        self.board = np.zeros((self.size, self.size))
         self.score = 0
         self.options = ['a', 's', 'd', 'w', 'quit']
 
+    '''
+    -----------------
+    UTILITY FUNCTIONS
+    -----------------
+    '''
     def printBoard(self):
         for row in range(self.size):
             print(self.board[row])
@@ -26,6 +31,11 @@ class game_2048:
             zeros += row.count(0)
         return zeros
 
+    '''
+    ----------------------
+    GAME RUNNING FUNCTIONS
+    ----------------------
+    ''' 
     def placeRandomTile(self):
         rand = random.randint(1, self.countZeros())
         tileVal = 2 * random.randint(1, 2)
@@ -119,6 +129,32 @@ class game_2048:
 
     def printScore(self):
         print('Current score is %d' % self.score)
+
+    '''
+    ---------------------
+    INTERACTION FUNCTIONS
+    ---------------------
+    '''
+    def getScore(self):
+        return self.score
+
+    # definitely need to convert this to checking if legal moves is empty
+    def isEnd(self):
+        return self.countZeros() == 0
+
+    def generateSuccessor(self, action):
+        if(action == 'a'):
+            self.swipeLeft()
+        elif(action == 'w'):
+            self.swipeUp()
+        elif(action == 'd'):
+            self.swipeRight()
+        else:
+            self.swipeDown()
+
+    # definitely need to convert this to a real get legal actions fn
+    def getLegalActions(self):
+        return ['a', 'w', 'd', 's']
 
 ############################################################
 
