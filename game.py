@@ -5,7 +5,7 @@ import player
 def play2048():
     game = gamestate.Game_2048()
     def evalFn(currentGameState):
-        weights = [[7,6,5,4],[6,5,4,3],[5,4,3,2],[4,3,2,1],[3,2,1,0]]
+        weights = [range(i,i+4) for i in range(1,5)]
         sum = 0.0
         for i in range(4):
             for j in range(4):
