@@ -8,14 +8,6 @@ class Player:
 
 
     def getAction(self, gameState):
-        """
-          Returns the expectimax action using self.depth and self.evaluationFunction
-
-          All ghosts should be modeled as choosing uniformly at random from their
-          legal moves.
-        """
-
-        # BEGIN_YOUR_CODE (our solution is 25 lines of code, but don't worry if you deviate from this)
         def V(gameState, depth, evalFn):
             legalMoves = list(gameState.getLegalMoves())
             if(gameState.isEnd()):
@@ -28,8 +20,8 @@ class Player:
                 for i in range(len(newStates)):
                     num_states = len(newStates[i])
                     potential_scores = [1.0 / num_states * V(newState, depth - 1, evalFn)[0] for newState in newStates[i]]
-                    max_score = sum(potential_scores)
-                    scores.append(max_score)
+                    avg_score = sum(potential_scores)
+                    scores.append(avg_score)
 
                 bestScore = max(scores)
                 bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]

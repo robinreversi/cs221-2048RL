@@ -1,6 +1,52 @@
 import collections, random
 import numpy as np
 import copy
+
+############################################################
+
+class Multi_Game_2048:
+    '''
+    A wrapper class acting as an intermediate between the individual boards and game.py
+    '''
+
+    def __init__(self):
+        self.n = 4
+        self.boards = [Game_2048() for _ in xrange(self.n)]
+        self.score = 0
+        self.legalMoves = set()
+
+    def updateScore(self):
+        self.score = sum(self.boards[k].score for k in xrange(self.n)) / float(self.n)
+
+    def updateLegalMoves(self):
+        legalMoves = self.boards[0].legalMoves
+        for k in xrange(1, self.n):
+            legalMoves = set.union(legalMoves, self.boards[k].legalMoves)
+        self.legalMoves = legalMoves
+
+    def isEnd(self):
+        for k in xrange(self.n):
+            if self.boards[k].isEnd(): return True
+        return False
+
+    def getScore(self):
+        self.updateScore()
+        return self.score
+
+    def getLegalMoves(self):
+        self.updateLegalMoves()
+        return self.legalMoves
+
+    def swipe(self, swipe):
+        for k in xrange(self.n):
+            self.boards[k].swipe(swipe)
+
+    def updateBoard(self):
+        for k in xrange(self.n):
+            self.boards[k].placeRandomTile()
+            self.boards[k].printScore()
+            self.boards[k].printBoard()
+
 ############################################################
 
 class Game_2048:
@@ -146,7 +192,6 @@ class Game_2048:
 
     def copy(self):
         return copy.deepcopy(self)
-
 
     def getLegalMoves(self):
         self.legalMoves = set()
