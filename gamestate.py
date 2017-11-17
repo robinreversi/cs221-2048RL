@@ -24,6 +24,7 @@ class Multi_Game_2048:
             legalMoves = set.union(legalMoves, self.boards[k].legalMoves)
         self.legalMoves = legalMoves
 
+
     def isEnd(self):
         for k in xrange(self.n):
             if self.boards[k].isEnd(): return True
