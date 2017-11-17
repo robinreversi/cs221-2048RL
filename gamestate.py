@@ -83,7 +83,7 @@ class Game_2048:
     def placeRandomTile(self):
         if self.countZeros() == 0: return
         empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if self.board[row, col] == 0]
-        tileval = 2
+        tileval = 4 if random.random() > 0.8 else 2  # assuming a 4:1 distribution ratio
         row, col = random.choice(empty_pos)
         self.board[row, col] = tileval
 
