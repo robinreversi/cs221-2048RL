@@ -15,6 +15,7 @@ class Game_2048:
         self.score = 0
         self.options = ['a', 's', 'd', 'w']
         self.legalMoves = set()
+        self.placeRandomTile()
 
     '''
     -----------------
@@ -36,11 +37,12 @@ class Game_2048:
     def placeRandomTile(self):
         if self.countZeros() == 0: return
         empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if self.board[row, col] == 0]
-        tileval = 2 * random.randint(1, 2)
+        tileval = 2
         row, col = random.choice(empty_pos)
         self.board[row, col] = tileval
 
-
+    def placeTile(self, row, col):
+        self.board[row][col] = 2
 
     def swipeLeft(self):
         for m in range(self.size):
@@ -95,10 +97,55 @@ class Game_2048:
             self.board[:, m] = np.concatenate((np.zeros(self.size - newrow.size), newrow))
 
 
+    '''
+    ---------------------
+    INTERACTION FUNCTIONS
+    ---------------------
+    '''
+    def getInput(self):
+        swipe = ''
+        while swipe not in self.options:
+            swipe = raw_input("Please enter a, s, d, w, or quit: ")
+            print('')
+        return swipe
 
-    def setLegalMoves(self):
+    def getScore(self):
+        return self.score
+
+    # should return a list of new boards
+    def generateSuccessor(self, action):
+        pre_action = self.copy()
+        if(action == 'a'):
+            pre_action.swipeLeft()
+        elif(action == 'w'):
+            pre_action.swipeUp()
+        elif(action == 'd'):
+            pre_action.swipeRight()
+        else:
+            pre_action.swipeDown()
+        empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if self.board[row, col] == 0]
+        post_actions = [copy.copy(self) for i in range(len(empty_pos))]
+        for i in range(len(post_actions)):
+            row, col = empty_pos[i]
+            post_actions[i].placeTile(row, col)
+        return post_actions
+
+    def swipe(self, action):
+        if(action == 'a'):
+            self.swipeLeft()
+        elif(action == 'w'):
+            self.swipeUp()
+        elif(action == 'd'):
+            self.swipeRight()
+        else:
+            self.swipeDown()
+
+    def copy(self):
+        return copy.deepcopy(self)
+
+
+    def getLegalMoves(self):
         self.legalMoves = set()
-
         if self.countZeros() > 0:
             for row in range(self.size):
                 for col in range(self.size):
@@ -128,67 +175,14 @@ class Game_2048:
                     self.legalMoves.update('s', 'w')
                     break
 
-    def isEnd(self):
-        return len(self.legalMoves) == 0
+        return self.legalMoves
 
-    def generateSuccessor(self, action):
-        if action == 'a':
-            self.swipeLeft()
-        elif action == 'w':
-            self.swipeUp()
-        elif action == 'd':
-            self.swipeRight()
-        elif action == 's':
-            self.swipeDown()
-        else: raise Exception('MoveError: could not generate successor board state')
+    def isEnd(self):
+        return len(self.getLegalMoves()) == 0
 
     def printScore(self):
         print('Current score is %d' % self.score)
 
-    '''
-    ---------------------
-    INTERACTION FUNCTIONS
-    ---------------------
-    '''
-    def getInput(self):
-        swipe = ''
-        while swipe not in self.options:
-            swipe = raw_input("Please enter a, s, d, w, or quit: ")
-            print('')
-        return swipe
-
-    def getScore(self):
-        return self.score
-
-    def getMove(self, swipe):
-        if swipe == 'a':
-            self.swipeLeft()
-        elif swipe == 's':
-            self.swipeDown()
-        elif swipe == 'd':
-            self.swipeRight()
-        elif swipe == 'w':
-            self.swipeUp()
-
-    """
-    def generateSuccessor(self, agentIndex, action):
-        # copy = self.copy(self)
-        #if(agentIndex == 0):
-            if(action == 'a'):
-                copy.swipeLeft()
-            elif(action == 'w'):
-                copy.swipeUp()
-            elif(action == 'd'):
-                copy.swipeRight()
-            else:
-                copy.swipeDown()
-        #else:
-        #    copy.placeRandomTile()
-        #return copy
-
-    #def copy(self):
-        #return copy.deepcopy(self)
-    """
 
 
 ############################################################
@@ -222,7 +216,7 @@ def playNGames2048(n):
         for k in xrange(n):
             games[k].placeRandomTile()
             games[k].printBoard()
-            games[k].setLegalMoves()
+            games[k].getLegalMoves()
             if checkEndGame(games, k): return
 
         allLegalMoves = unionLegalMoves(games, n)
@@ -241,4 +235,4 @@ def playNGames2048(n):
 
 ############################################################
 
-playNGames2048(1)
+#playNGames2048(1)
