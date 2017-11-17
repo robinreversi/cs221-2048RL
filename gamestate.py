@@ -128,7 +128,7 @@ class Game_2048:
         else:
             pre_action.swipeDown()
         empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if pre_action.board[row, col] == 0]
-        post_actions = [copy.copy(self) for i in range(len(empty_pos))]
+        post_actions = [copy.copy(pre_action) for i in range(len(empty_pos))]
         for i in range(len(post_actions)):
             row, col = empty_pos[i]
             post_actions[i].placeTile(row, col)
