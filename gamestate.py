@@ -2,7 +2,7 @@ import collections, random
 import numpy as np
 ############################################################
 
-class game_2048:
+class Game_2048:
     '''
     Creates a game of 2048.
     Access self.board in the same way as a matrix, i.e. self.board[row][col].
@@ -48,6 +48,9 @@ class game_2048:
                         self.board[row][col] = tileVal
                         return
 
+    # The swipes are similar, but slight differences make it convenient to keep them separate.
+    # Can gather into one function if really necessary.
+
     def swipeLeft(self):
         for row in range(self.size):
             if sum(self.board[row]) == 0: continue
@@ -61,8 +64,6 @@ class game_2048:
             while len(newRow) < self.size: newRow.append(0)
             self.board[row] = newRow
 
-    # The swipes are similar, but slight differences make it convenient to keep them separate.
-    # Can gather into one function if necessary.
     def swipeRight(self):
         for row in range(self.size):
             if sum(self.board[row]) == 0: continue
@@ -108,6 +109,11 @@ class game_2048:
             for row in range(self.size):
                 self.board[row][col] = newCol[row]
 
+    '''
+    ---------------------
+    INTERACTION FUNCTIONS
+    ---------------------
+    '''
     def getInput(self):
         swipe = ''
         while swipe not in self.options:
@@ -115,26 +121,6 @@ class game_2048:
             print('')
         return swipe
 
-    def getMove(self, swipe):
-        if swipe == 'a':
-            self.swipeLeft()
-        elif swipe == 's':
-            self.swipeDown()
-        elif swipe == 'd':
-            self.swipeRight()
-        elif swipe == 'w':
-            self.swipeUp()
-        else:
-            return
-
-    def printScore(self):
-        print('Current score is %d' % self.score)
-
-    '''
-    ---------------------
-    INTERACTION FUNCTIONS
-    ---------------------
-    '''
     def getScore(self):
         return self.score
 
@@ -152,6 +138,21 @@ class game_2048:
         else:
             self.swipeDown()
 
+    def printScore(self):
+        print('Current score is %d' % self.score)
+
+    def getMove(self, swipe):
+        if swipe == 'a':
+            self.swipeLeft()
+        elif swipe == 's':
+            self.swipeDown()
+        elif swipe == 'd':
+            self.swipeRight()
+        elif swipe == 'w':
+            self.swipeUp()
+        else:
+            return
+
     # TODO: definitely need to convert this to a real get legal actions fn
     # playerIndex will be 0 or 1 depending on whether the player is
     # swiping (0) or the computer is putting a random move
@@ -159,13 +160,13 @@ class game_2048:
         if(playerIndex == 0):
             return ['a', 'w', 'd', 's']
         else:
-            return [(i, j) for i in range(self.size) for j in range(self.size)\
+            return [(i, j) for i in xrange(self.size) for j in xrange(self.size)\
                     if self.board[i][j] == 0]
 
 ############################################################
 
 def playNGames2048(n):
-    games = [game_2048() for _ in range(n)]
+    games = [Game_2048() for _ in xrange(n)]
     numMoves = 0
 
     print('Welcome to n-2048!')
@@ -175,19 +176,19 @@ def playNGames2048(n):
     print('')
 
     while 1:
-        for k in range(n):
+        for k in xrange(n):
             if games[k].countZeros() == 0:
                 print('Game over at board %d!' % k)
                 games[k].printBoard()
-                score = sum(games[_].score for _ in range(n))
+                score = sum(games[_].score for _ in xrange(n))
                 print('Your score is %2.f!' % (score / float(n)))
                 print('Your number of moves is %d' % numMoves)
                 return
-        for k in range(n):
+        for k in xrange(n):
             games[k].placeRandomTile()
             games[k].printBoard()
         swipe = games[0].getInput()
-        for k in range(n):
+        for k in xrange(n):
             games[k].getMove(swipe)
         numMoves += 1
 
