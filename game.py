@@ -4,7 +4,9 @@ import player
 
 def play2048():
     game = gamestate.Game_2048()
-    agent = player.Player()
+    def evalFn(currentGameState):
+        return currentGameState.getScore()
+    agent = player.Player(2, evalFn)
 
     while not game.isEnd():
         action = agent.getAction(game.copy())
