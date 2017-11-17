@@ -11,9 +11,10 @@ class Game_2048:
 
     def __init__(self):
         self.size = 4
-        self.board = np.zeros((self.size, self.size))
+        self.board = [[0 for _ in range(self.size)] for _ in range(self.size)] # np.zeros((self.size, self.size))
         self.score = 0
         self.options = ['a', 's', 'd', 'w', 'quit']
+        self.legalMoves = set()
 
     '''
     -----------------
@@ -37,6 +38,7 @@ class Game_2048:
     ----------------------
     ''' 
     def placeRandomTile(self):
+        if self.countZeros() == 0: return
         rand = random.randint(1, self.countZeros())
         tileVal = 2 * random.randint(1, 2)
         count = 0
@@ -48,8 +50,6 @@ class Game_2048:
                         self.board[row][col] = tileVal
                         return
 
-    # The swipes are similar, but slight differences make it convenient to keep them separate.
-    # Can gather into one function if really necessary.
 
     def swipeLeft(self):
         for row in range(self.size):
@@ -109,6 +109,56 @@ class Game_2048:
             for row in range(self.size):
                 self.board[row][col] = newCol[row]
 
+
+    def setLegalMoves(self):
+        self.legalMoves = set()
+
+        if self.countZeros() > 0:
+            for row in range(self.size):
+                for col in range(self.size):
+                    if self.board[row][col] == 0:
+                        def checkNeighbors(self, row, col):
+                            if row - 1 in range(self.size) and self.board[row - 1][col] > 0:
+                                self.legalMoves.update('s')
+                            if row + 1 in range(self.size) and self.board[row + 1][col] > 0:
+                                self.legalMoves.update('w')
+                            if col - 1 in range(self.size) and self.board[row][col - 1] > 0:
+                                self.legalMoves.update('d')
+                            if col + 1 in range(self.size) and self.board[row][col + 1] > 0:
+                                self.legalMoves.update('a')
+                        checkNeighbors(self, row, col)
+
+        # Check for horizontal matches
+        for row in range(self.size):
+            for col in range(self.size - 1):
+                if self.board[row][col] == self.board[row][col + 1] != 0:
+                    self.legalMoves.update('a', 'd')
+                    break
+
+        # Check for vertical matches
+        for row in range(self.size - 1):
+            for col in range(self.size):
+                if self.board[row][col] == self.board[row + 1][col] != 0:
+                    self.legalMoves.update('s', 'w')
+                    break
+
+    def isEnd(self):
+        return len(self.legalMoves) == 0
+
+    def generateSuccessor(self, action):
+        if action == 'a':
+            self.swipeLeft()
+        elif action == 'w':
+            self.swipeUp()
+        elif action == 'd':
+            self.swipeRight()
+        elif action == 's':
+            self.swipeDown()
+        else: raise Exception('MoveError: could not generate successor board state')
+
+    def printScore(self):
+        print('Current score is %d' % self.score)
+
     '''
     ---------------------
     INTERACTION FUNCTIONS
@@ -124,23 +174,6 @@ class Game_2048:
     def getScore(self):
         return self.score
 
-    # definitely need to convert this to checking if legal moves is empty
-    def isEnd(self):
-        return self.countZeros() == 0
-
-    def generateSuccessor(self, action):
-        if(action == 'a'):
-            self.swipeLeft()
-        elif(action == 'w'):
-            self.swipeUp()
-        elif(action == 'd'):
-            self.swipeRight()
-        else:
-            self.swipeDown()
-
-    def printScore(self):
-        print('Current score is %d' % self.score)
-
     def getMove(self, swipe):
         if swipe == 'a':
             self.swipeLeft()
@@ -152,16 +185,6 @@ class Game_2048:
             self.swipeUp()
         else:
             return
-
-    # TODO: definitely need to convert this to a real get legal actions fn
-    # playerIndex will be 0 or 1 depending on whether the player is
-    # swiping (0) or the computer is putting a random move
-    def getLegalActions(self, playerIndex):
-        if(playerIndex == 0):
-            return ['a', 'w', 'd', 's']
-        else:
-            return [(i, j) for i in xrange(self.size) for j in xrange(self.size)\
-                    if self.board[i][j] == 0]
 
 ############################################################
 
@@ -175,21 +198,39 @@ def playNGames2048(n):
     print('Score is determined by average score over the %d boards at the end.' % n)
     print('')
 
+    def checkEndGame(games, k):
+        if games[k].isEnd():
+            print('Game over at board %d!' % k)
+            games[k].printBoard()
+            score = sum(games[_].score for _ in xrange(n))
+            print('Your score is %2.f!' % (score / float(n)))
+            print('Your number of moves is %d' % numMoves)
+            return True
+
+    def unionLegalMoves(games, n):
+        allLegalMoves = games[0].legalMoves
+        for k in range(1, n):
+            allLegalMoves = set.union(allLegalMoves, games[k].legalMoves)
+        return allLegalMoves
+
     while 1:
-        for k in xrange(n):
-            if games[k].countZeros() == 0:
-                print('Game over at board %d!' % k)
-                games[k].printBoard()
-                score = sum(games[_].score for _ in xrange(n))
-                print('Your score is %2.f!' % (score / float(n)))
-                print('Your number of moves is %d' % numMoves)
-                return
         for k in xrange(n):
             games[k].placeRandomTile()
             games[k].printBoard()
-        swipe = games[0].getInput()
+            games[k].setLegalMoves()
+            if checkEndGame(games, k): return
+
+        allLegalMoves = unionLegalMoves(games, n)
+
+        while 1 < 2:
+            print("Legal moves are: %s" % ', '.join(move for move in allLegalMoves))
+            swipe = games[0].getInput()
+            if swipe in allLegalMoves: break
+            else: print("Please enter a valid move!")
+
         for k in xrange(n):
             games[k].getMove(swipe)
+
         numMoves += 1
 
 
