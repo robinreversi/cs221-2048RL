@@ -9,8 +9,8 @@ class Multi_Game_2048:
     A wrapper class acting as an intermediate between the individual boards and game.py
     '''
 
-    def __init__(self):
-        self.n = 4
+    def __init__(self, n):
+        self.n = n
         self.boards = [Game_2048() for _ in xrange(self.n)]
         self.score = 0
         self.legalMoves = set()

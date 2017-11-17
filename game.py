@@ -3,7 +3,8 @@ import gamestate
 import player
 
 def play2048():
-    game = gamestate.Multi_Game_2048()
+    # game = gamestate.Multi_Game_2048(4)
+    game = gamestate.Game_2048()
 
     def evalFn(currentGameState):
         weights = [[7,6,5,4],[6,5,4,3],[5,4,3,2],[4,3,2,1]]
@@ -20,7 +21,10 @@ def play2048():
 
         print "Action: " + str(action)
         game.swipe(action)
-        game.updateBoard()
+        # game.updateBoard()
+        game.placeRandomTile()
+        game.printScore()
+        game.printBoard()
 
 
 ####################################################
