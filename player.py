@@ -17,9 +17,7 @@ class Player:
 
         # BEGIN_YOUR_CODE (our solution is 25 lines of code, but don't worry if you deviate from this)
         def V(gameState, depth, evalFn):
-            print gameState
-            legalMoves = gameState.getLegalMoves()
-            print "Legal Moves: " + str(legalMoves)
+            legalMoves = list(gameState.getLegalMoves())
             if(gameState.isEnd()):
                 return (gameState.getScore(), 'w')
             elif(depth == 0):
@@ -28,11 +26,11 @@ class Player:
                 newStates = [gameState.generateSuccessor(action) for action in legalMoves]
                 scores = []
                 for i in range(len(newStates)):
-                    scores.append([V(newState, depth + 1, evalFn)[0] for newState in newStates[i]])
+                    scores.append([V(newState, depth - 1, evalFn)[0] for newState in newStates[i]])
                 bestScore = max(scores)
                 bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
-                chosenMove = random.choice(bestIndices)
-                return (bestScore, chosenMove)
+                chosenIndex = random.choice(bestIndices)
+                return (bestScore, legalMoves[chosenIndex])
             
         value, chosenMove = V(gameState, self.depth, self.evalFn)
         return chosenMove

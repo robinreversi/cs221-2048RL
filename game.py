@@ -9,6 +9,7 @@ def play2048():
     agent = player.Player(2, evalFn)
     while not game.isEnd():
         action = agent.getAction(game.copy())
+        print "Action: " + str(action)
         game.swipe(action)
         game.placeRandomTile()
         game.printScore()
