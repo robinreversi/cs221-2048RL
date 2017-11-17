@@ -22,11 +22,11 @@ class Player:
                     potential_scores = [1.0 / num_states * V(newState, depth - 1, evalFn)[0] for newState in newStates[i]]
                     avg_score = sum(potential_scores)
                     scores.append(avg_score)
-
                 bestScore = max(scores)
                 bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
                 chosenIndex = random.choice(bestIndices)
-                return (bestScore, legalMoves[chosenIndex])
+                move_value_pairings = [(move, scores[i]) for i, move in enumerate(legalMoves)]
+                return (bestScore, legalMoves[chosenIndex], move_value_pairings)
             
-        value, chosenMove = V(gameState, self.depth, self.evalFn)
-        return chosenMove
+        value, chosenMove, move_value_pairings = V(gameState, self.depth, self.evalFn)
+        return (chosenMove, move_value_pairings)
