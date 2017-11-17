@@ -4,6 +4,7 @@ import player
 
 def play2048():
     games = [gamestate.Game_2048() for _ in range(4)]
+    # game = gamestate.Multi_Game_2048(4)
     def evalFn(currentGameState):
         if currentGameState.isEnd():
             return float('-inf')
@@ -39,4 +40,12 @@ def play2048():
         print('Current score is ', total)
 
 
-play2048()
+
+####################################################
+
+def main():
+    play2048()
+
+
+if __name__ == '__main__':
+    main()
