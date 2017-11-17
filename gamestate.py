@@ -7,14 +7,13 @@ class Game_2048:
     '''
     Creates a game of 2048.
     Access self.board in the same way as a matrix, i.e. self.board[row][col].
-    Suboptimal implementation in some parts - consider converting lists to numpy arrays
     '''
 
     def __init__(self):
         self.size = 4
-        self.board = [[0 for _ in range(self.size)] for _ in range(self.size)] # np.zeros((self.size, self.size))
+        self.board = np.zeros((self.size, self.size))
         self.score = 0
-        self.options = ['a', 's', 'd', 'w', 'quit']
+        self.options = ['a', 's', 'd', 'w']
         self.legalMoves = set()
 
     '''
@@ -23,15 +22,11 @@ class Game_2048:
     -----------------
     '''
     def printBoard(self):
-        for row in range(self.size):
-            print(self.board[row])
+        print(self.board)
         print('')
 
     def countZeros(self):
-        zeros = 0
-        for row in self.board:
-            zeros += row.count(0)
-        return zeros
+        return np.count_nonzero(self.board == 0)
 
     '''
     ----------------------
@@ -40,69 +35,65 @@ class Game_2048:
     ''' 
     def placeRandomTile(self):
         if self.countZeros() == 0: return
-        empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if self.board[row][col] == 0]
+        empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if self.board[row, col] == 0]
         tileval = 2 * random.randint(1, 2)
-        row, col = random.sample(empty_pos)
-        self.board[row][col] = tileval
+        row, col = random.choice(empty_pos)
+        self.board[row, col] = tileval
+
 
 
     def swipeLeft(self):
-        for row in range(self.size):
-            if sum(self.board[row]) == 0: continue
-            newRow = filter(lambda x: x != 0, self.board[row])
-            for x in range(len(newRow) - 1):
-                if newRow[x] == newRow[x + 1]:
-                    newRow[x + 1] *= 2
-                    self.score += newRow[x + 1]
-                    del newRow[x]
-                    break
-            while len(newRow) < self.size: newRow.append(0)
-            self.board[row] = newRow
+        for m in range(self.size):
+            row = self.board[m, :]
+            if sum(row) == 0: continue
+            row = row[row != 0]
+            rowlist = row.tolist()
+            for i in xrange(row.size - 1):
+                if rowlist[i] == rowlist[i + 1]:
+                    rowlist[i] *= 2
+                    rowlist[i + 1] = 0
+            newrow = np.array(filter(lambda x: x != 0, rowlist))
+            self.board[m, :] = np.concatenate((newrow, np.zeros(self.size - newrow.size)))
 
     def swipeRight(self):
-        for row in range(self.size):
-            if sum(self.board[row]) == 0: continue
-            newRow = filter(lambda x: x != 0, self.board[row])
-            for _ in range(len(newRow) - 1):
-                x = len(newRow) - _ - 1
-                if newRow[x] == newRow[x - 1]:
-                    newRow[x - 1] *= 2
-                    self.score += newRow[x - 1]
-                    del newRow[x]
-                    break
-            while len(newRow) < self.size: newRow = [0] + newRow
-            self.board[row] = newRow
+        for m in range(self.size):
+            row = self.board[m, :]
+            if sum(row) == 0: continue
+            row = row[row != 0]
+            rowlist = row.tolist()
+            for i in xrange(row.size - 1, 0, -1):
+                if rowlist[i] == rowlist[i - 1]:
+                    rowlist[i] *= 2
+                    rowlist[i - 1] = 0
+            newrow = np.array(filter(lambda x: x != 0, rowlist))
+            self.board[m, :] = np.concatenate((np.zeros(self.size - newrow.size), newrow))
 
     def swipeUp(self):
-        for col in range(self.size):
-            column = [self.board[row][col] for row in range(self.size)]
-            if sum(column) == 0: continue
-            newCol = filter(lambda x: x != 0, column)
-            for x in range(len(newCol) - 1):
-                if newCol[x] == newCol[x + 1]:
-                    newCol[x + 1] *= 2
-                    self.score += newCol[x + 1]
-                    del newCol[x]
-                    break
-            while len(newCol) < self.size: newCol.append(0)
-            for row in range(self.size):
-                self.board[row][col] = newCol[row]
+        for m in range(self.size):
+            row = self.board[:, m]
+            if sum(row) == 0: continue
+            row = row[row != 0]
+            rowlist = row.tolist()
+            for i in xrange(row.size - 1):
+                if rowlist[i] == rowlist[i + 1]:
+                    rowlist[i] *= 2
+                    rowlist[i + 1] = 0
+            newrow = np.array(filter(lambda x: x != 0, rowlist))
+            self.board[:, m] = np.concatenate((newrow, np.zeros(self.size - newrow.size)))
 
     def swipeDown(self):
-        for col in range(self.size):
-            column = [self.board[row][col] for row in range(self.size)]
-            if sum(column) == 0: continue
-            newCol = filter(lambda x: x != 0, column)
-            for _ in range(len(newCol) - 1):
-                x = len(newCol) - _ - 1
-                if newCol[x] == newCol[x - 1]:
-                    newCol[x - 1] *= 2
-                    self.score += newCol[x - 1]
-                    del newCol[x]
-                    break
-            while len(newCol) < self.size: newCol = [0] + newCol
-            for row in range(self.size):
-                self.board[row][col] = newCol[row]
+        for m in range(self.size):
+            row = self.board[:, m]
+            if sum(row) == 0: continue
+            row = row[row != 0]
+            rowlist = row.tolist()
+            for i in xrange(row.size - 1, 0, -1):
+                if rowlist[i] == rowlist[i - 1]:
+                    rowlist[i] *= 2
+                    rowlist[i - 1] = 0
+            newrow = np.array(filter(lambda x: x != 0, rowlist))
+            self.board[:, m] = np.concatenate((np.zeros(self.size - newrow.size), newrow))
+
 
 
     def setLegalMoves(self):
@@ -111,29 +102,29 @@ class Game_2048:
         if self.countZeros() > 0:
             for row in range(self.size):
                 for col in range(self.size):
-                    if self.board[row][col] == 0:
+                    if self.board[row, col] == 0:
                         def checkNeighbors(self, row, col):
-                            if row - 1 in range(self.size) and self.board[row - 1][col] > 0:
+                            if row - 1 in range(self.size) and self.board[row - 1, col] > 0:
                                 self.legalMoves.update('s')
-                            if row + 1 in range(self.size) and self.board[row + 1][col] > 0:
+                            if row + 1 in range(self.size) and self.board[row + 1, col] > 0:
                                 self.legalMoves.update('w')
-                            if col - 1 in range(self.size) and self.board[row][col - 1] > 0:
+                            if col - 1 in range(self.size) and self.board[row, col - 1] > 0:
                                 self.legalMoves.update('d')
-                            if col + 1 in range(self.size) and self.board[row][col + 1] > 0:
+                            if col + 1 in range(self.size) and self.board[row, col + 1] > 0:
                                 self.legalMoves.update('a')
                         checkNeighbors(self, row, col)
 
         # Check for horizontal matches
         for row in range(self.size):
             for col in range(self.size - 1):
-                if self.board[row][col] == self.board[row][col + 1] != 0:
+                if self.board[row, col] == self.board[row, col + 1] != 0:
                     self.legalMoves.update('a', 'd')
                     break
 
         # Check for vertical matches
         for row in range(self.size - 1):
             for col in range(self.size):
-                if self.board[row][col] == self.board[row + 1][col] != 0:
+                if self.board[row, col] == self.board[row + 1, col] != 0:
                     self.legalMoves.update('s', 'w')
                     break
 
@@ -250,4 +241,4 @@ def playNGames2048(n):
 
 ############################################################
 
-playNGames2048(4)
+playNGames2048(1)
