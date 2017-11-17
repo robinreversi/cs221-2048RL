@@ -53,6 +53,7 @@ class Game_2048:
             for i in xrange(row.size - 1):
                 if rowlist[i] == rowlist[i + 1]:
                     rowlist[i] *= 2
+                    self.score += rowlist[i]
                     rowlist[i + 1] = 0
             newrow = np.array(filter(lambda x: x != 0, rowlist))
             self.board[m, :] = np.concatenate((newrow, np.zeros(self.size - newrow.size)))
@@ -66,6 +67,7 @@ class Game_2048:
             for i in xrange(row.size - 1, 0, -1):
                 if rowlist[i] == rowlist[i - 1]:
                     rowlist[i] *= 2
+                    self.score += rowlist[i]
                     rowlist[i - 1] = 0
             newrow = np.array(filter(lambda x: x != 0, rowlist))
             self.board[m, :] = np.concatenate((np.zeros(self.size - newrow.size), newrow))
@@ -79,6 +81,7 @@ class Game_2048:
             for i in xrange(row.size - 1):
                 if rowlist[i] == rowlist[i + 1]:
                     rowlist[i] *= 2
+                    self.score += rowlist[i]
                     rowlist[i + 1] = 0
             newrow = np.array(filter(lambda x: x != 0, rowlist))
             self.board[:, m] = np.concatenate((newrow, np.zeros(self.size - newrow.size)))
@@ -92,6 +95,7 @@ class Game_2048:
             for i in xrange(row.size - 1, 0, -1):
                 if rowlist[i] == rowlist[i - 1]:
                     rowlist[i] *= 2
+                    self.score += rowlist[i]
                     rowlist[i - 1] = 0
             newrow = np.array(filter(lambda x: x != 0, rowlist))
             self.board[:, m] = np.concatenate((np.zeros(self.size - newrow.size), newrow))
