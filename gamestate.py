@@ -1,5 +1,6 @@
 import collections, random
 import numpy as np
+import copy
 ############################################################
 
 class Game_2048:
@@ -39,16 +40,10 @@ class Game_2048:
     ''' 
     def placeRandomTile(self):
         if self.countZeros() == 0: return
-        rand = random.randint(1, self.countZeros())
-        tileVal = 2 * random.randint(1, 2)
-        count = 0
-        for row in range(self.size):
-            for col in range(self.size):
-                if self.board[row][col] == 0:
-                    count += 1
-                    if count == rand:
-                        self.board[row][col] = tileVal
-                        return
+        empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if self.board[row][col] == 0]
+        tileval = 2 * random.randint(1, 2)
+        row, col = random.sample(empty_pos)
+        self.board[row][col] = tileval
 
 
     def swipeLeft(self):
@@ -183,8 +178,27 @@ class Game_2048:
             self.swipeRight()
         elif swipe == 'w':
             self.swipeUp()
-        else:
-            return
+
+    """
+    def generateSuccessor(self, agentIndex, action):
+        # copy = self.copy(self)
+        #if(agentIndex == 0):
+            if(action == 'a'):
+                copy.swipeLeft()
+            elif(action == 'w'):
+                copy.swipeUp()
+            elif(action == 'd'):
+                copy.swipeRight()
+            else:
+                copy.swipeDown()
+        #else:
+        #    copy.placeRandomTile()
+        #return copy
+
+    #def copy(self):
+        #return copy.deepcopy(self)
+    """
+
 
 ############################################################
 
