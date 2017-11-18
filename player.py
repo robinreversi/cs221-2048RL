@@ -25,7 +25,9 @@ class Player:
                 bestScore = max(scores)
                 bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
                 chosenIndex = random.choice(bestIndices)
-                move_value_pairings = [(move, scores[i]) for i, move in enumerate(legalMoves)]
+                move_value_pairings = None
+                if(depth == 2):
+                    move_value_pairings = [(move, scores[i]) for i, move in enumerate(legalMoves)]
                 return (bestScore, legalMoves[chosenIndex], move_value_pairings)
             
         value, chosenMove, move_value_pairings = V(gameState, self.depth, self.evalFn)

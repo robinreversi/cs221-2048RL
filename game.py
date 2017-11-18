@@ -1,5 +1,7 @@
 import collections, random
 import gamestate
+import matplotlib.pyplot as plt
+import numpy as np
 import player
 
 def play2048():
@@ -11,14 +13,29 @@ def play2048():
             for j in range(4):
                 sum += weights[i][j] * currentGameState.board[i,j]
         return currentGameState.getScore() + sum
-    agent = player.Player(2, evalFn)
-    while not game.isEnd():
-        action = agent.getAction(game.copy())
-        print "Action: " + str(action)
-        game.swipe(action)
-        game.placeRandomTile()
-        game.printScore()
-        game.printBoard()
 
-
+    scores = []
+    for _ in range(1):
+        game = gamestate.Game_2048()
+        print _
+        agent = player.Player(2, evalFn)
+        while not game.isEnd():
+            action = agent.getAction(game.copy())[0]
+            print "Action: " + str(action)
+            game.swipe(action)
+            game.placeRandomTile()
+            game.printScore()
+            game.printBoard()
+        scores.append(game.getScore())
+    
+    scores = np.array(scores)
+    average = scores.sum() / 50
+    variance = np.sum((scores - average) ** 2)  / 50
+    plt.scatter(range(50), scores)
+    plt.xlabel('trial')
+    plt.ylabel('score')
+    plt.plot(range(50), [average for _ in range(50)], 'b')
+    plt.show()
+    print average
+    print variance
 play2048()
