@@ -10,7 +10,7 @@ observation = env.reset()
 for t in range(5):
     print "BEFORE:"
     env.render()
-    action = random.choice(env.action_space)
+    action = env.action_space.sample()
     print "ACTION" + str(action)
     next_observation, reward, done, info = env.step(action)
     print "AFTER"
