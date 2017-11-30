@@ -121,6 +121,9 @@ class Game2048Env(gym.Env):
     def isEnd(self):
         return len(self.getLegalMoves()) == 0
 
+    def countZeros(self):
+        return np.count_nonzero(self.board == 0)
+
     '''
     ----------------------
     GAME RUNNING FUNCTIONS
