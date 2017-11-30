@@ -7,13 +7,14 @@ env = gym.make('2048-v0')
 
 env.seed()
 observation = env.reset()
-for t in range(5):
+end = False
+while not end:
     print "BEFORE:"
     env.render()
     action = env.action_space.sample()
     print "ACTION" + str(action)
-    next_observation, reward, done, info = env.step(action)
+    next_observation, reward, end, info = env.step(action)
     print "AFTER"
-    print next_observation
+    env.render()
     
     

@@ -40,6 +40,7 @@ class Game2048Env(gym.Env):
             self.swipeDown()
         else:
             self.swipeLeft()
+        self.placeRandomTile()
         reward = self.score - prev_score
         done = self.isEnd()
         #print("Am I done? {}".format(done))        
@@ -93,27 +94,27 @@ class Game2048Env(gym.Env):
                     if self.board[row, col] == 0:
                         def checkNeighbors(self, row, col):
                             if row - 1 in range(self.size) and self.board[row - 1, col] > 0:
-                                self.legalMoves.update(2)
+                                self.legalMoves.add(2)
                             if row + 1 in range(self.size) and self.board[row + 1, col] > 0:
-                                self.legalMoves.update(0)
+                                self.legalMoves.add(0)
                             if col - 1 in range(self.size) and self.board[row, col - 1] > 0:
-                                self.legalMoves.update(1)
+                                self.legalMoves.add(1)
                             if col + 1 in range(self.size) and self.board[row, col + 1] > 0:
-                                self.legalMoves.update(3)
+                                self.legalMoves.add(3)
                         checkNeighbors(self, row, col)
 
         # Check for horizontal matches
         for row in range(self.size):
             for col in range(self.size - 1):
                 if self.board[row, col] == self.board[row, col + 1] != 0:
-                    self.legalMoves.update(1, 3)
+                    self.legalMoves.update([1, 3])
                     break
 
         # Check for vertical matches
         for row in range(self.size - 1):
             for col in range(self.size):
                 if self.board[row, col] == self.board[row + 1, col] != 0:
-                    self.legalMoves.update(0, 2)
+                    self.legalMoves.update([0, 2])
                     break
 
         return self.legalMoves
