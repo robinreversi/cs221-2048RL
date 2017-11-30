@@ -1,5 +1,7 @@
 import collections, random, operator
 import gamestate
+import matplotlib.pyplot as plt
+import numpy as np
 import player
 import matplotlib.pyplot as plot
 
@@ -15,6 +17,7 @@ def play2048(num_boards):
             for j in range(4):
                 sum += weights[i][j] * currentGameState.board[i,j]
         return currentGameState.getScore() + sum
+
     agent = player.Player(2, evalFn)
     done = False
     total = 0.0
