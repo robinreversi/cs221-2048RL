@@ -59,7 +59,7 @@ class Game2048Env(gym.Env):
         self.placeRandomTile()
         self.placeRandomTile()
 
-        return self.Matrix.flatten()
+        return self.board.flatten()
 
     def _render(self, mode='human', close=False):
         if close:
@@ -120,6 +120,9 @@ class Game2048Env(gym.Env):
 
     def isEnd(self):
         return len(self.getLegalMoves()) == 0
+
+    def countZeros(self):
+        return np.count_nonzero(self.board == 0)
 
     '''
     ----------------------
