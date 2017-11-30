@@ -59,7 +59,7 @@ class Game2048Env(gym.Env):
         self.placeRandomTile()
         self.placeRandomTile()
 
-        return self.Matrix.flatten()
+        return self.board.flatten()
 
     def _render(self, mode='human', close=False):
         if close:
