@@ -1,5 +1,7 @@
 import collections, random, operator
 import gamestate
+import matplotlib.pyplot as plt
+import numpy as np
 import player
 
 def play2048():
@@ -14,6 +16,7 @@ def play2048():
             for j in range(4):
                 sum += weights[i][j] * currentGameState.board[i,j]
         return currentGameState.getScore() + sum
+
     agent = player.Player(2, evalFn)
     done = False
     while not done:
@@ -21,7 +24,7 @@ def play2048():
         count = collections.defaultdict(float)
         for game in games:
             action,vals = agent.getAction(game.copy())
-            print "Action: " + str(action)
+            #print "Action: " + str(action)
             for move,score in vals:
                 values[move] += score
                 count[move] += 1
