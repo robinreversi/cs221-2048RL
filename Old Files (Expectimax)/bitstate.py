@@ -9,7 +9,7 @@ class Game_2048:
     Access self.board in the same way as a matrix, i.e. self.board[row][col].
     '''
         
-    def __init__(self, board, tableL, tableR):
+    def __init__(self, board, tableL, tableR, scoreTable):
         self.size = 4
         self.board = board
         self.options = ['a', 's', 'd', 'w']
@@ -17,6 +17,7 @@ class Game_2048:
         if tableL != None:
             self.tableL = tableL
             self.tableR = tableR
+            self.scoreTable = scoreTable
         else:
             self.initTables()
 
@@ -29,6 +30,7 @@ class Game_2048:
     def initTables(self):
         self.tableL = {}
         self.tableR = {}
+        self.scoreTable = {}
         num = self.size << 2
         for a in range(num):
             for b in range(num):
@@ -38,6 +40,7 @@ class Game_2048:
                         if sum(row) == 0:
                             self.tableL[0] = 0
                             self.tableR[0] = 0
+                            self.scoreTable[0] = 0
                             continue
                         rowL = row[row != 0].copy()
                         rowR = row[row != 0]
@@ -62,6 +65,11 @@ class Game_2048:
                         valR = newrowR[0] << 12 | newrowR[1] << 8 | newrowR[2] << 4 | newrowR[3]
                         self.tableL[key] = valL
                         self.tableR[key] = valR
+                        score = 0
+                        for x in xrange(self.size):
+                            val = row[x]
+                            score += (val - 1) * (1 << val)
+                        self.scoreTable[key] = score
         print self.tableR[17]
                         
     
@@ -170,16 +178,15 @@ class Game_2048:
         return swipe
 
     def getScore(self):
-        score = 0
-        for x in xrange(self.size ** 2):
-            val = ((0xF << (4 * x)) & self.board) >> (4 * x)
-            if val >= 2:
-                score += (val - 1) * (1 << val)
-        return score
+        row1 = (0xFFFF << 48 & self.board) >> 48
+        row2 = (0xFFFF << 32 & self.board) >> 32
+        row3 = (0xFFFF << 16 & self.board) >> 16
+        row4 = 0xFFFF & self.board
+        return self.scoreTable[row1] + self.scoreTable[row2] + self.scoreTable[row3] + self.scoreTable[row4]
 
     # should return a list of new boards
     def generateSuccessor(self, action):
-        pre_action = Game_2048.fromOld(self.board, self.tableL, self.tableR)
+        pre_action = Game_2048(self.board, self.tableL, self.tableR, self.scoreTable)
         if(action == 'a'):
             pre_action.swipeLeft()
         elif(action == 'w'):
@@ -189,7 +196,7 @@ class Game_2048:
         else:
             pre_action.swipeDown()
         empty_pos = pre_action.emptyPos()
-        post_actions = [Game_2048.fromOld(pre_action.board, pre_action.tableL, pre_action.tableR) for i in xrange(len(empty_pos))]
+        post_actions = [Game_2048(pre_action.board, pre_action.tableL, pre_action.tableR, pre_action.scoreTable) for i in xrange(len(empty_pos))]
         for i in xrange(len(empty_pos)):
             emp = empty_pos[i]
             post_actions[i].placeTile(emp)

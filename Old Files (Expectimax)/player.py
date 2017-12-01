@@ -1,5 +1,6 @@
 import random
 import time
+import numpy as np
 class Player:
 
     def __init__(self, depth, evalFn):
@@ -9,7 +10,7 @@ class Player:
 
     def getAction(self, gameState):
         def V(gameState, depth, evalFn):
-            legalMoves = gameState.options
+            legalMoves = list(gameState.getLegalMoves())
             if(gameState.isEnd()):
                 return (gameState.getScore(), 'w')
             elif(depth == 0):
@@ -19,9 +20,12 @@ class Player:
                 newStates = [gameState.generateSuccessor(action) for action in legalMoves]
                 mid = time.time()
                 scores = []
+                state_vals = [[evalFn(item) for item in lst] for lst in newStates]
                 for i in range(len(newStates)):
-                    num_states = len(newStates[i])
-                    potential_scores = [1.0 / num_states * V(newState, depth - 1, evalFn)[0] for newState in newStates[i]]
+                    lst = state_vals[i]
+                    inds = np.argsort(lst)[:3]
+                    sample_states = [newStates[i][k] for k in inds]
+                    potential_scores = [1.0 / len(sample_states) * V(newState, depth - 1, evalFn)[0] for newState in sample_states]
                     avg_score = sum(potential_scores)
                     scores.append(avg_score)
                 bestScore = max(scores)
