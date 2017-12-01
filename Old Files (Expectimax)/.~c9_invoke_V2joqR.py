@@ -8,6 +8,14 @@ class Game_2048:
     Creates a game of 2048.
     Access self.board in the same way as a matrix, i.e. self.board[row][col].
     '''
+
+    def __init__(self):
+        self.size = 4
+        self.board = long(0) + 1 << (4 * rand.randint(0,15))
+        self.options = ['a', 's', 'd', 'w']
+        self.legalMoves = set()
+        self.randomize = False
+        self.initTables()
         
     def __init__(self, board, tableL, tableR):
         self.size = 4
@@ -15,20 +23,15 @@ class Game_2048:
         self.options = ['a', 's', 'd', 'w']
         self.legalMoves = set()
         self.randomize = False
-        if tableL != None:
-            self.tableL = tableL
-            self.tableR = tableR
-        else:
-            self.initTables()
+        self.tableL = tableL
+        self.tableR = tableR
         
     @classmethod
-    def fromNew(cls):
-        cls(long(0) + 1 << (4 * rand.randint(0,15)), None, None)
+    def fromNew():
         
         
     @classmethod
-    def fromOld(cls,board,tableL,tableR):
-        cls(board, tableL, tableR)
+    def fromOld():
 
     '''
     -----------------
@@ -64,10 +67,10 @@ class Game_2048:
                                 self.score += rowlist[i]
                                 rowlist[i - 1] = 0
                         newrowR = np.array(filter(lambda x: x != 0, rowlist))
-                        key = row[0] << 48 | row[1] << 32 | row[2] << 16 | row[3]
-                        valL = newrowL[0] << 48 | newrowL[1] << 32 | newrowL[2] << 16 | newrowL[3]
-                        valR = newrowR[0] << 48 | newrowR[1] << 32 | newrowR[2] << 16 | newrowR[3]
-                        self.tableL[key] = valL
+                        key = row[0] << 12 | row[1] << 8 | row[2] << 4 | row[3]
+                        valL = newrowL[0] << 12 | newrowL[1] << 8 | newrowL[2] << 4 | newrowL[3]
+                        valR = newrowR[0] << 12 | newrowR[1] << 8 | newrowR[2] << 4 | newrowR[3]
+        for x in range(self.):
                         self.tableR[key] = valR
                         
     
@@ -127,38 +130,38 @@ class Game_2048:
         self.board += tileval << (4 * id)
         
 
-    def placeTile(self, pos):
-        self.board += 1 << (4 * pos)
+    def placeTile(self, row, col):
+        self.board[row][col] = 2
 
     def swipeLeft(self):
-        row1 = (0xFFFF << 48 & self.board) >> 48
-        row2 = (0xFFFF << 32 & self.board) >> 32
-        row3 = (0xFFFF << 16 & self.board) >> 16
+        row1 = (0xFFFF << 12 & self.board) >> 12
+        row2 = (0xFFFF << 8 & self.board) >> 8
+        row3 = (0xFFFF << 4 & self.board) >> 4
         row4 = 0xFFFF & self.board
-        self.board = self.tableL[row1] << 48 | self.tableL[row2] << 32 | self.tableL[row3] << 16 | self.tableL[row4]
+        self.board = self.tableL[row1] << 12 | self.tableL[row2] << 8 | self.tableL[row3] << 4 | self.tableL[row4]
 
     def swipeRight(self):
-        row1 = (0xFFFF << 48 & self.board) >> 48
-        row2 = (0xFFFF << 32 & self.board) >> 32
-        row3 = (0xFFFF << 16 & self.board) >> 16
+        row1 = (0xFFFF << 12 & self.board) >> 12
+        row2 = (0xFFFF << 8 & self.board) >> 8
+        row3 = (0xFFFF << 4 & .boardself) >> 4
         row4 = 0xFFFF & self.board
-        self.board = self.tableR[row1] << 48 | self.tableR[row2] << 32 | self.tableR[row3] << 16 | self.tableR[row4]
+        self.board = self.tableR[row1] << 12 | self.tableR[row2] << 8 | self.tableR[row3] << 4 | self.tableR[row4]
 
     def swipeUp(self):
         transpose = self.transpose(self.board)
-        row1 = (0xFFFF << 48 & transpose) >> 48
-        row2 = (0xFFFF << 32 & transpose) >> 32
-        row3 = (0xFFFF << 16 & transpose) >> 16
+        row1 = (0xFFFF << 12 & transpose) >> 12
+        row2 = (0xFFFF << 8 & transpose) >> 8
+        row3 = (0xFFFF << 4 & transpose) >> 4
         row4 = 0xFFFF & transpose
-        self.board = self.transpose(self.tableL[row1] << 48 | self.tableL[row2] << 32 | self.tableL[row3] << 16 | self.tableL[row4])
+        self.board = self.transpose(self.tableL[row1] << 12 | self.tableL[row2] << 8 | self.tableL[row3] << 4 | self.tableL[row4])
 
     def swipeDown(self):
         transpose = self.transpose(self.board)
-        row1 = (0xFFFF << 48 & transpose) >> 48
-        row2 = (0xFFFF << 32 & transpose) >> 32
-        row3 = (0xFFFF << 16 & transpose) >> 16
+        row1 = (0xFFFF << 12 & transpose) >> 12
+        row2 = (0xFFFF << 8 & transpose) >> 8
+        row3 = (0xFFFF << 4 & transpose) >> 4
         row4 = 0xFFFF & transpose
-        self.board = self.transpose(self.tableR[row1] << 48 | self.tableR[row2] << 32 | self.tableR[row3] << 16 | self.tableR[row4])
+        self.board = self.transpose(self.tableR[row1] << 12 | self.tableR[row2] << 8 | self.tableR[row3] << 4 | self.tableR[row4])
 
 
     '''
@@ -183,7 +186,7 @@ class Game_2048:
 
     # should return a list of new boards
     def generateSuccessor(self, action):
-        pre_action = Game_2048.fromOld(self.board, self.tableL, self.tableR)
+        pre_action = self.copy()
         if(action == 'a'):
             pre_action.swipeLeft()
         elif(action == 'w'):
@@ -192,11 +195,11 @@ class Game_2048:
             pre_action.swipeRight()
         else:
             pre_action.swipeDown()
-        empty_pos = self.emptyPos()
-        post_actions = [Game_2048.fromOld(self.board, self.tableL, self.tableR) for i in xrange(len(empty_pos))]
-        for i in xrange(len(post_actions)):
-            emp = empty_pos[i]
-            post_actions[i].placeTile(emp)
+        empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if pre_action.board[row, col] == 0]
+        post_actions = [copy.copy(pre_action) for i in range(len(empty_pos))]
+        for i in range(len(post_actions)):
+            row, col = empty_pos[i]
+            post_actions[i].placeTile(row, col)
         return post_actions
 
     def swipe(self, action):
@@ -213,13 +216,41 @@ class Game_2048:
         return copy.deepcopy(self)
 
     def getLegalMoves(self):
-        legalmoves = set()
-        for action in self.actions:
-            tempboard = copy.deepcopy(self)
-            tempboard.swipe(action)
-            if tempboard.board != self.board:
-                legalmoves.add(action)
-        return legalmoves
+        """
+        self.legalMoves = set()
+        if self.countZeros() > 0:
+            for row in range(self.size):
+                for col in range(self.size):
+                    if self.board[row, col] == 0:
+                        def checkNeighbors(self, row, col):
+                            if row - 1 in range(self.size) and self.board[row - 1, col] > 0:
+                                self.legalMoves.update('s')
+                            if row + 1 in range(self.size) and self.board[row + 1, col] > 0:
+                                self.legalMoves.update('w')
+                            if col - 1 in range(self.size) and self.board[row, col - 1] > 0:
+                                self.legalMoves.update('d')
+                            if col + 1 in range(self.size) and self.board[row, col + 1] > 0:
+                                self.legalMoves.update('a')
+                        checkNeighbors(self, row, col)
+
+        # Check for horizontal matches
+        for row in range(self.size):
+            for col in range(self.size - 1):
+                if self.board[row, col] == self.board[row, col + 1] != 0:
+                    self.legalMoves.update('a', 'd')
+                    break
+
+        # Check for vertical matches
+        for row in range(self.size - 1):
+            for col in range(self.size):
+                if self.board[row, col] == self.board[row + 1, col] != 0:
+                    self.legalMoves.update('s', 'w')
+                    break
+
+        return self.legalMoves
+        """
+        
+        
 
     def isEnd(self):
         return len(self.getLegalMoves()) == 0
@@ -275,5 +306,3 @@ def playNGames2048(n):
             games[k].getMove(swipe)
 
         numMoves += 1
-
-

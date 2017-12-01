@@ -33,7 +33,7 @@ class Game_2048:
     '''
     -----------------
     UTILITY FUNCTIONS
-    -----------------
+        cls(board, tableL, tableR)
     '''
     def initTables(self):
         self.tableL = {}
@@ -194,7 +194,7 @@ class Game_2048:
             pre_action.swipeDown()
         empty_pos = self.emptyPos()
         post_actions = [Game_2048.fromOld(self.board, self.tableL, self.tableR) for i in xrange(len(empty_pos))]
-        for i in xrange(len(post_actions)):
+        for i in range(len(post_actions)):
             emp = empty_pos[i]
             post_actions[i].placeTile(emp)
         return post_actions
@@ -275,5 +275,3 @@ def playNGames2048(n):
             games[k].getMove(swipe)
 
         numMoves += 1
-
-
