@@ -10,7 +10,7 @@ def play2048(num_boards):
     # game = gamestate.Multi_Game_2048(4)
     def evalFn(currentGameState):
         if currentGameState.isEnd():
-            return float('-inf')
+            return float(0)
         weights = [range(i, i + 4) for i in range(1, 5)]
         sum = 0.0
         for i in range(4):
