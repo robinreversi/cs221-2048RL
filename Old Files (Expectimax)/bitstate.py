@@ -19,15 +19,7 @@ class Game_2048:
             self.tableR = tableR
         else:
             self.initTables()
-        
-    @classmethod
-    def fromNew(cls):
-        return cls(long(0) + 1 << (4 * rand.randint(0,15)), None, None)
-        
-        
-    @classmethod
-    def fromOld(cls,board,tableL,tableR):
-        return cls(board, tableL, tableR)
+
 
     '''
     -----------------

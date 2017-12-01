@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import player
 import matplotlib.pyplot as plot
-import time
 
 def play2048(num_boards):
     games = [bitstate.Game_2048.fromNew() for _ in range(num_boards)]
@@ -27,10 +26,7 @@ def play2048(num_boards):
         values = collections.defaultdict(float)
         count = collections.defaultdict(float)
         for game in games:
-            start = time.time()
             action,vals = agent.getAction(bitstate.Game_2048.fromOld(game.board,game.tableL,game.tableR))
-            end = time.time()
-            print ('Get action time: ', end - start)
             print "Action: " + str(action)
             for move,score in vals:
                 values[move] += score
