@@ -1,5 +1,5 @@
 import random
-
+import time
 class Player:
 
     def __init__(self, depth, evalFn):
@@ -9,13 +9,15 @@ class Player:
 
     def getAction(self, gameState):
         def V(gameState, depth, evalFn):
-            legalMoves = list(gameState.getLegalMoves())
+            legalMoves = gameState.options
             if(gameState.isEnd()):
                 return (gameState.getScore(), 'w')
             elif(depth == 0):
                 return (evalFn(gameState), random.choice(legalMoves))
             else:
+                start = time.time()
                 newStates = [gameState.generateSuccessor(action) for action in legalMoves]
+                mid = time.time()
                 scores = []
                 for i in range(len(newStates)):
                     num_states = len(newStates[i])
@@ -26,6 +28,7 @@ class Player:
                 bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
                 chosenIndex = random.choice(bestIndices)
                 move_value_pairings = [(move, scores[i]) for i, move in enumerate(legalMoves)]
+                end = time.time()
                 return (bestScore, legalMoves[chosenIndex], move_value_pairings)
             
         value, chosenMove, move_value_pairings = V(gameState, self.depth, self.evalFn)

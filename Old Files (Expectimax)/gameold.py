@@ -6,6 +6,7 @@ def play2048():
     games = [gamestate.Game_2048() for _ in range(4)]
     # game = gamestate.Multi_Game_2048(4)
     def evalFn(currentGameState):
+        '''
         if currentGameState.isEnd():
             return float('-inf')
         weights = [range(i,i+4) for i in range(1,5)]
@@ -13,7 +14,8 @@ def play2048():
         for i in range(4):
             for j in range(4):
                 sum += weights[i][j] * currentGameState.board[i,j]
-        return currentGameState.getScore() + sum
+        '''
+        return currentGameState.getScore() #+ sum
     agent = player.Player(2, evalFn)
     done = False
     while not done:
