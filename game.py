@@ -11,11 +11,18 @@ def play2048(num_boards):
     def evalFn(currentGameState):
         if currentGameState.isEnd():
             return float('-inf')
+
+        """
+        
+        
+        """
         weights = [range(i,i+4) for i in range(1,5)]
         sum = 0.0
         for i in range(4):
             for j in range(4):
                 sum += weights[i][j] * currentGameState.board[i,j]
+
+
         return currentGameState.getScore() + sum
 
     agent = player.Player(2, evalFn)
