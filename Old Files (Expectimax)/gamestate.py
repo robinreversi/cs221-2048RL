@@ -1,6 +1,3 @@
-import gym
-from gym import spaces
-from gym.utils import seeding
 
 import collections, random
 import numpy as np
@@ -168,6 +165,13 @@ class Game_2048:
     def getScore(self):
         return self.score
 
+    def getHighest(self):
+        max = self.board[0,0]
+        for i in range(self.size):
+            for j in range(self.size):
+                if self.board[i,j] > max:
+                    max = self.board[i,j]
+        return max
     # should return a list of new boards
     def generateSuccessor(self, action):
         pre_action = self.copy()

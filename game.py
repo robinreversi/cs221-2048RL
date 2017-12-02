@@ -1,11 +1,12 @@
 import collections, random, operator
-import gamestate
+import bitstate
 import matplotlib.pyplot as plt
 import numpy as np
 import player
+import matplotlib.pyplot as plot
 
-def play2048():
-    games = [gamestate.Game_2048() for _ in range(4)]
+def play2048(num_boards):
+    games = [gamestate.Game_2048() for _ in range(num_boards)]
     # game = gamestate.Multi_Game_2048(4)
     def evalFn(currentGameState):
         if currentGameState.isEnd():
@@ -19,6 +20,7 @@ def play2048():
 
     agent = player.Player(2, evalFn)
     done = False
+    total = 0.0
     while not done:
         values = collections.defaultdict(float)
         count = collections.defaultdict(float)
@@ -37,17 +39,27 @@ def play2048():
             game.swipe(action)
             game.placeRandomTile()
             total += game.getScore()
-            game.printBoard()
+            #game.printBoard()
             if game.isEnd():
                 done = True
-        print('Current score is ', total)
+    return total / num_boards
 
 
 
 ####################################################
 
 def main():
-    play2048()
+    averages = []
+    for board_size in range(2,9):
+        lst = []
+        for _ in range(5):
+            print _
+            lst.append(play2048(board_size))
+        averages.append(sum(lst) / 10)
+    plot.scatter(range(2,9),averages)
+    plot.xlabel('Board Size')
+    plot.ylabel('Average Score per Board')
+    plot.show()
 
 
 if __name__ == '__main__':
