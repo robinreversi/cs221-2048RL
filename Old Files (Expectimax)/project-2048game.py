@@ -28,7 +28,7 @@ class game_2048:
     def countZeros(self):
         zeros = 0
         for row in self.board:
-            zeros += row.count(0)
+            zeros += (1 - np.count_nonzero(row))
         return zeros
 
     '''
@@ -188,4 +188,4 @@ def playNGames2048(n):
 
 ############################################################
 
-playNGames2048(4)
+playNGames2048(5)
