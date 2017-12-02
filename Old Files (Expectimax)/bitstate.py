@@ -9,26 +9,18 @@ class Game_2048:
     Access self.board in the same way as a matrix, i.e. self.board[row][col].
     '''
         
-    def __init__(self, board, tableL, tableR):
+    def __init__(self, board, tableL, tableR, scoreTable):
         self.size = 4
         self.board = board
         self.options = ['a', 's', 'd', 'w']
-        self.legalMoves = set()
         self.randomize = False
         if tableL != None:
             self.tableL = tableL
             self.tableR = tableR
+            self.scoreTable = scoreTable
         else:
             self.initTables()
-        
-    @classmethod
-    def fromNew(cls):
-        return cls(long(0) + 1 << (4 * rand.randint(0,15)), None, None)
-        
-        
-    @classmethod
-    def fromOld(cls,board,tableL,tableR):
-        return cls(board, tableL, tableR)
+
 
     '''
     -----------------
@@ -38,6 +30,7 @@ class Game_2048:
     def initTables(self):
         self.tableL = {}
         self.tableR = {}
+        self.scoreTable = {}
         num = self.size << 2
         for a in range(num):
             for b in range(num):
@@ -47,6 +40,7 @@ class Game_2048:
                         if sum(row) == 0:
                             self.tableL[0] = 0
                             self.tableR[0] = 0
+                            self.scoreTable[0] = 0
                             continue
                         rowL = row[row != 0].copy()
                         rowR = row[row != 0]
@@ -71,13 +65,26 @@ class Game_2048:
                         valR = newrowR[0] << 12 | newrowR[1] << 8 | newrowR[2] << 4 | newrowR[3]
                         self.tableL[key] = valL
                         self.tableR[key] = valR
+                        score = 0
+                        for x in xrange(self.size):
+                            val = row[x]
+                            score += (val - 1) * (1 << val)
+                        self.scoreTable[key] = score
         print self.tableR[17]
+                        
     
     def bitToBoard(self):
         board = np.zeros(self.size ** 2)
         for k in xrange(self.size ** 2):
+<<<<<<< HEAD
             board[k] = (self.board >> (4 * k)) & 0xF
         board =board.reshape((self.size, self.size))
+=======
+            board[k] = 1 << ((self.board >> (4 * k)) & 0xF)
+            if board[k] == 1:
+                board[k] = 0
+        board = board[::-1].reshape((self.size, self.size))
+>>>>>>> 0a90216ca9fb61ab50b61367a88123efec71bf91
         return board
         
     def printBoard(self):
@@ -100,10 +107,17 @@ class Game_2048:
                 lst.append(x)
         return lst
     
+<<<<<<< HEAD
     def transpose(self):
         c1 = self.board & 0xF0F00F0FF0F00F0F
         c2 = self.board & 0x0000F0F00000F0F0
         c3 = self.board & 0x0F0F00000F0F0000
+=======
+    def transpose(self,board):
+        c1 = board & 0xF0F00F0FF0F00F0F
+        c2 = board & 0x0000F0F00000F0F0
+        c3 = board & 0x0F0F00000F0F0000
+>>>>>>> 0a90216ca9fb61ab50b61367a88123efec71bf91
         c = c1 | (c2 << 12) | (c3 >> 12)
         d1 = c & 0xFF00FF0000FF00FF
         d2 = c & 0x00FF00FF00000000
@@ -130,7 +144,7 @@ class Game_2048:
         
 
     def placeTile(self, pos):
-        self.board += 1 << (4 * pos)
+        self.board = self.board | 1 << (4 * pos)
 
     def swipeLeft(self):
         row1 = (0xFFFF << 48 & self.board) >> 48
@@ -176,16 +190,24 @@ class Game_2048:
         return swipe
 
     def getScore(self):
+<<<<<<< HEAD
         score = 0
         for x in xrange(self.size ** 2):
             val = ((0xF << x) & self.board) >> x
             if val >= 2:
                 score += (val - 1) * (1 << val)
         return score
+=======
+        row1 = (0xFFFF << 48 & self.board) >> 48
+        row2 = (0xFFFF << 32 & self.board) >> 32
+        row3 = (0xFFFF << 16 & self.board) >> 16
+        row4 = 0xFFFF & self.board
+        return self.scoreTable[row1] + self.scoreTable[row2] + self.scoreTable[row3] + self.scoreTable[row4]
+>>>>>>> 0a90216ca9fb61ab50b61367a88123efec71bf91
 
     # should return a list of new boards
     def generateSuccessor(self, action):
-        pre_action = Game_2048.fromOld(self.board, self.tableL, self.tableR)
+        pre_action = Game_2048(self.board, self.tableL, self.tableR, self.scoreTable)
         if(action == 'a'):
             pre_action.swipeLeft()
         elif(action == 'w'):
@@ -194,9 +216,15 @@ class Game_2048:
             pre_action.swipeRight()
         else:
             pre_action.swipeDown()
+<<<<<<< HEAD
         empty_pos = self.emptyPos()
         post_actions = [Game_2048.fromOld(self.board, self.tableL, self.tableR) for i in xrange(len(empty_pos))]
         for i in xrange(len(post_actions)):
+=======
+        empty_pos = pre_action.emptyPos()
+        post_actions = [Game_2048(pre_action.board, pre_action.tableL, pre_action.tableR, pre_action.scoreTable) for i in xrange(len(empty_pos))]
+        for i in xrange(len(empty_pos)):
+>>>>>>> 0a90216ca9fb61ab50b61367a88123efec71bf91
             emp = empty_pos[i]
             post_actions[i].placeTile(emp)
         return post_actions
@@ -217,20 +245,38 @@ class Game_2048:
     def getLegalMoves(self):
         legalmoves = set()
         for action in self.options:
-            tempboard = copy.deepcopy(self)
+            tempboard = Game_2048
             tempboard.swipe(action)
             if tempboard.board != self.board:
                 legalmoves.add(action)
         return legalmoves
 
     def isEnd(self):
+<<<<<<< HEAD
         return len(self.getLegalMoves()) == 0
+=======
+        grid = self.bitToBoard()
+        for i in range(self.size):
+            for j in range(self.size):
+                e = grid[i, j]
+                if not e:
+                    return False
+                if j and e == grid[i, j - 1]:
+                    return False
+                if i and e == grid[i - 1, j]:
+                    return False
+        return True
+>>>>>>> 0a90216ca9fb61ab50b61367a88123efec71bf91
+
+    def printScore(self):
+        print('Current score is %d' % self.score)
+
 
 
 ############################################################
 
 def playNGames2048(n):
-    games = [Game_2048() for _ in xrange(n)]
+    games = [Game_2048.fromNew() for _ in xrange(n)]
     numMoves = 0
 
     print('Welcome to n-2048!')
@@ -243,25 +289,18 @@ def playNGames2048(n):
         if games[k].isEnd():
             print('Game over at board %d!' % k)
             games[k].printBoard()
-            score = sum(games[_].score for _ in xrange(n))
+            score = sum(games[_].getScore() for _ in xrange(n))
             print('Your score is %2.f!' % (score / float(n)))
             print('Your number of moves is %d' % numMoves)
             return True
-
-    def unionLegalMoves(games, n):
-        allLegalMoves = games[0].legalMoves
-        for k in range(1, n):
-            allLegalMoves = set.union(allLegalMoves, games[k].legalMoves)
-        return allLegalMoves
 
     while 1:
         for k in xrange(n):
             games[k].placeRandomTile()
             games[k].printBoard()
-            games[k].getLegalMoves()
             if checkEndGame(games, k): return
 
-        allLegalMoves = unionLegalMoves(games, n)
+        allLegalMoves = games[k].options
 
         while 1 < 2:
             print("Legal moves are: %s" % ', '.join(move for move in allLegalMoves))
@@ -270,8 +309,8 @@ def playNGames2048(n):
             else: print("Please enter a valid move!")
 
         for k in xrange(n):
-            games[k].getMove(swipe)
+            games[k].swipe(swipe)
 
         numMoves += 1
 
-
+#playNGames2048(1)
