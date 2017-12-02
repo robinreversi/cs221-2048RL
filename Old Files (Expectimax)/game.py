@@ -10,23 +10,35 @@ import time
 def play2048(num_boards):
     games = [gamestate.Game_2048() for _ in range(num_boards)]
     # game = gamestate.Multi_Game_2048(4)
+    weights1 = [range(i,i+4) for i in range(1,5)]
+    weights2 = [xrange(i+3, i-1,-1) for i in range(1, 5)]
+    weights3 = [xrange(i+3, i-1,-1) for i in xrange(4, 0,-1)]
+    weights4 = [range(i, i + 4) for i in xrange(4, 0,-1)]
+    print weights1
+    print weights2
+    print weights3
+    print weights4
     def evalFn(currentGameState):
-
         if currentGameState.isEnd():
             return float('-inf')
-        weights = [range(i, i + 4) for i in range(1, 5)]
-        sum = 0.0
+        sum1 = 0.0
+        sum2 = 0.0
+        sum3 = 0.0
+        sum4 = 0.0
         for i in range(4):
             for j in range(4):
-                sum += weights[i][j] * currentGameState.board[i,j]
+                sum1 += weights1[i][j] * currentGameState.board[i,j]
+                sum2 += weights2[i][j] * currentGameState.board[i, j]
+                sum3 += weights3[i][j] * currentGameState.board[i, j]
+                sum4 += weights4[i][j] * currentGameState.board[i, j]
 
-
-        return currentGameState.getScore() + sum
+        return currentGameState.getScore() + sum1
 
     agent = player.Player(2, evalFn)
     done = False
     total = 0.0
     moves = 0
+    highest_tile = []
     while not done:
         values = collections.defaultdict(float)
         count = collections.defaultdict(float)
@@ -42,16 +54,21 @@ def play2048(num_boards):
         for key in values:
             values[move] /= count[move]
         action = max(values.iteritems(), key=operator.itemgetter(1))[0]
-        total = 0.0
         for game in games:
             game.swipe(action)
             game.placeRandomTile()
-            total += game.getScore()
             game.printBoard()
             print ("Score: ",game.getScore())
             if game.isEnd():
-                done = True
-    return total / float(num_boards)
+                total += game.getScore()
+                highest_tile.append(game.getHighest())
+                games.remove(game)
+        if float(len(games)) < float(1 * num_boards):
+            for game in games:
+                total += game.getScore()
+                highest_tile.append(game.getHighest())
+            done = True
+    return total / float(num_boards),highest_tile
 
 
 
@@ -59,9 +76,18 @@ def play2048(num_boards):
 
 def main():
     score = 0
-    for i in range(10):
-        score += play2048(1)
+    lst = []
+    dict = collections.defaultdict(int)
+    for i in range(2):
+        curr_score,highest = play2048(2)
+        score += curr_score
+        lst.append(highest)
+        dict[max(highest)] += 1
     print ("Average: ", score/ 10.0)
+    for i in lst:
+        print("Highest tile for all board: ",i)
+        print("Highest tile for 1 board: ",max(i))
+    print dict
     '''
     averages = []
     for board_size in range(2,9):
