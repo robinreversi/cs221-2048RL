@@ -59,7 +59,7 @@ class Game_2048:
 
     def __init__(self):
         self.size = 4
-        self.board = np.zeros((self.size, self.size))
+        self.board = np.zeros((self.size, self.size)).astype(int)
         self.score = 0
         self.options = ['a', 's', 'd', 'w']
         self.legalMoves = set()
@@ -174,6 +174,7 @@ class Game_2048:
         return max
     # should return a list of new boards
     def generateSuccessor(self, action):
+        '''
         pre_action = self.copy()
         if(action == 'a'):
             pre_action.swipeLeft()
@@ -184,12 +185,29 @@ class Game_2048:
         else:
             pre_action.swipeDown()
         empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if pre_action.board[row, col] == 0]
-        post_actions = [copy.copy(pre_action) for i in range(len(empty_pos))]
+        post_actions = [copy.deepcopy(pre_action) for i in range(len(empty_pos))]
         for i in range(len(post_actions)):
             row, col = empty_pos[i]
             post_actions[i].placeTile(row, col)
         return post_actions
+        '''
 
+        post_action = self.copy()
+        if(action == 'a'):
+            post_action.swipeLeft()
+        elif(action == 'w'):
+            post_action.swipeUp()
+        elif(action == 'd'):
+            post_action.swipeRight()
+        else:
+            post_action.swipeDown()
+        for row in range(self.size):
+            for col in range(self.size):
+                if post_action.board[row, col] == 0:
+                    post_action.placeTile(row, col)
+        return post_action
+        
+        
     def swipe(self, action):
         if(action == 'a'):
             self.swipeLeft()

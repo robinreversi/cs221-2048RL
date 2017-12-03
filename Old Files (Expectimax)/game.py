@@ -7,6 +7,10 @@ import player
 import matplotlib.pyplot as plot
 import time
 
+DEPTH = 3
+NUM_BOARDS = 1
+NUM_GAMES = 10
+
 def play2048(num_boards):
     games = [gamestate.Game_2048() for _ in range(num_boards)]
     # game = gamestate.Multi_Game_2048(4)
@@ -74,7 +78,7 @@ def play2048(num_boards):
 
         return eval
 
-    agent = player.Player(2, evalFn)
+    agent = player.Player(DEPTH, evalFn)
     done = False
     total = 0.0
     moves = 0
@@ -118,12 +122,12 @@ def main():
     score = 0
     lst = []
     dict = collections.defaultdict(int)
-    for i in range(5):
-        curr_score,highest = play2048(1)
+    for i in range(NUM_GAMES):
+        curr_score,highest = play2048(NUM_BOARDS)
         score += curr_score
         lst.append(highest)
         dict[max(highest)] += 1
-    print ("Average: ", score / 5.0)
+    print ("Average: ", score / float(NUM_GAMES))
     for i in lst:
         print("Highest tile for all board: ",i)
         print("Highest tile for 1 board: ",max(i))
