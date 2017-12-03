@@ -37,23 +37,19 @@ with tf.Session() as sess:
         obs = env.reset()
         done = False
         while not done:
-            print("t")
             a, init_q_values = sess.run([action, q_values], feed_dict={board_vals:obs})
             if(random.random() < epsilon):
                 a[0] = env.action_space.sample()
 
             new_obs, reward, done, info = env.step(a[0])
 
-            print('k')
             new_q_values = sess.run(q_values, feed_dict={board_vals:new_obs})
 
             # V of the new state = max of the q values
             max_new_q = np.max(new_q_values)
             targetQ = init_q_values
             targetQ[0, a[0]] = reward + DISCOUNT * max_new_q
-            print("s")
-            print(W1)
-            _, W1 = sess.run([updateModel, W1], feed_dict={board_vals: obs, nextQ: targetQ})
+            _ = sess.run([updateModel], feed_dict={board_vals: obs, nextQ: targetQ})
 
             obs = new_obs
             #print("AFTER ACTION")
