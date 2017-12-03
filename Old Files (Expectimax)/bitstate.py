@@ -45,7 +45,7 @@ class Game_2048:
                         rowL = row[row != 0].copy()
                         rowR = row[row != 0]
                         rowlist = rowL.tolist()
-                        for i in xrange(rowL.size - 1):
+                        for i in range(rowL.size - 1):
                             if rowlist[i] == rowlist[i + 1]:
                                 rowlist[i] += 1
                                 rowlist[i + 1] = 0
@@ -53,7 +53,7 @@ class Game_2048:
                         newrowL = np.concatenate((newrowL,np.zeros(self.size - newrowL.size))).tolist()
                         newrowL = map(int, newrowL)
                         rowlist = rowR.tolist()
-                        for i in xrange(rowR.size - 1, 0, -1):
+                        for i in range(rowR.size - 1, 0, -1):
                             if rowlist[i] == rowlist[i - 1]:
                                 rowlist[i] += 1
                                 rowlist[i - 1] = 0
@@ -66,16 +66,15 @@ class Game_2048:
                         self.tableL[key] = valL
                         self.tableR[key] = valR
                         score = 0
-                        for x in xrange(self.size):
+                        for x in range(self.size):
                             val = row[x]
                             score += (val - 1) * (1 << val)
                         self.scoreTable[key] = score
-        print self.tableR[17]
                         
     
     def bitToBoard(self):
         board = np.zeros(self.size ** 2)
-        for k in xrange(self.size ** 2):
+        for k in range(self.size ** 2):
             '''
 <<<<<<< HEAD
             board[k] = (self.board >> (4 * k)) & 0xF
@@ -93,7 +92,7 @@ class Game_2048:
 
     def countZeros(self):
         count = 0
-        for x in xrange(self.size ** 2):
+        for x in range(self.size ** 2):
             i = 0xF << x
             if i & self.board == 0:
                 count+=1
@@ -101,7 +100,7 @@ class Game_2048:
     
     def emptyPos(self):
         lst = []
-        for x in xrange(self.size ** 2):
+        for x in range(self.size ** 2):
             i = 0xF << x
             if i & self.board == 0:
                 lst.append(x)
@@ -185,7 +184,7 @@ class Game_2048:
     def getScore(self):
         '''
         score = 0
-        for x in xrange(self.size ** 2):
+        for x in range(self.size ** 2):
             val = ((0xF << x) & self.board) >> x
             if val >= 2:
                 score += (val - 1) * (1 << val)
@@ -209,8 +208,8 @@ class Game_2048:
         else:
             pre_action.swipeDown()
         empty_pos = pre_action.emptyPos()
-        post_actions = [Game_2048(pre_action.board, pre_action.tableL, pre_action.tableR, pre_action.scoreTable) for i in xrange(len(empty_pos))]
-        for i in xrange(len(empty_pos)):
+        post_actions = [Game_2048(pre_action.board, pre_action.tableL, pre_action.tableR, pre_action.scoreTable) for i in range(len(empty_pos))]
+        for i in range(len(empty_pos)):
             emp = empty_pos[i]
             post_actions[i].placeTile(emp)
         return post_actions
@@ -258,7 +257,7 @@ class Game_2048:
 ############################################################
 
 def playNGames2048(n):
-    games = [Game_2048.fromNew() for _ in xrange(n)]
+    games = [Game_2048.fromNew() for _ in range(n)]
     numMoves = 0
 
     print('Welcome to n-2048!')
@@ -271,13 +270,13 @@ def playNGames2048(n):
         if games[k].isEnd():
             print('Game over at board %d!' % k)
             games[k].printBoard()
-            score = sum(games[_].getScore() for _ in xrange(n))
+            score = sum(games[_].getScore() for _ in range(n))
             print('Your score is %2.f!' % (score / float(n)))
             print('Your number of moves is %d' % numMoves)
             return True
 
     while 1:
-        for k in xrange(n):
+        for k in range(n):
             games[k].placeRandomTile()
             games[k].printBoard()
             if checkEndGame(games, k): return
@@ -290,7 +289,7 @@ def playNGames2048(n):
             if swipe in allLegalMoves: break
             else: print("Please enter a valid move!")
 
-        for k in xrange(n):
+        for k in range(n):
             games[k].swipe(swipe)
 
         numMoves += 1

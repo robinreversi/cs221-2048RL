@@ -137,7 +137,7 @@ class Game2048Env(gym.Env):
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1):
+            for i in range(row.size - 1):
                 if rowlist[i] == rowlist[i + 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
@@ -151,7 +151,7 @@ class Game2048Env(gym.Env):
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1, 0, -1):
+            for i in range(row.size - 1, 0, -1):
                 if rowlist[i] == rowlist[i - 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
@@ -165,7 +165,7 @@ class Game2048Env(gym.Env):
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1):
+            for i in range(row.size - 1):
                 if rowlist[i] == rowlist[i + 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
@@ -179,7 +179,7 @@ class Game2048Env(gym.Env):
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1, 0, -1):
+            for i in range(row.size - 1, 0, -1):
                 if rowlist[i] == rowlist[i - 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]

@@ -203,7 +203,7 @@ class Game_2048:
             post_action.swipeDown()
         for row in range(self.size):
             for col in range(self.size):
-                if post_action.board[row, col] == 0 and random.random() > .5:
+                if post_action.board[row, col] == 0 and random.random() < .8:
                     post_action.placeTile(row, col)
         return post_action
         

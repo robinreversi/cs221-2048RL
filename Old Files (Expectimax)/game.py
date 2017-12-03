@@ -8,7 +8,7 @@ import matplotlib.pyplot as plot
 import time
 
 DEPTH = 2
-NUM_BOARDS = 16
+NUM_BOARDS = 1
 NUM_GAMES = 10
 
 def play2048(num_boards):
@@ -18,10 +18,6 @@ def play2048(num_boards):
     weights2 = [range(i+3, i-1,-1) for i in range(1, 5)]
     weights3 = [range(i+3, i-1,-1) for i in range(4, 0,-1)]
     weights4 = [range(i, i + 4) for i in range(4, 0,-1)]
-    print weights1
-    print weights2
-    print weights3
-    print weights4
 
     def evalFn(currentGameState):
         if currentGameState.isEnd():
@@ -91,7 +87,7 @@ def play2048(num_boards):
             action,vals = agent.getAction(game.copy())
             end = time.time()
             print("Time: ", end - start)
-            print "Action: " + str(action)
+            print("Action: " + str(action))
             for move,score in vals:
                 values[move] += score
                 count[move] += 1
@@ -121,17 +117,17 @@ def play2048(num_boards):
 def main():
     score = 0
     lst = []
-    dict = collections.defaultdict(int)
+    dictA = collections.defaultdict(int)
     for i in range(NUM_GAMES):
         curr_score,highest = play2048(NUM_BOARDS)
         score += curr_score
         lst.append(highest)
-        dict[max(highest)] += 1
+        dictA[max(highest)] += 1
     print ("Average: ", score / float(NUM_GAMES))
     for i in lst:
         print("Highest tile for all board: ",i)
         print("Highest tile for 1 board: ",max(i))
-    print dict
+    print(dictA)
     '''
     averages = []
     for board_size in range(2,9):
