@@ -23,7 +23,6 @@ class MultiGame2048Env(gym.Env):
     metadata = {'render.modes': ['human', 'ansi']}
     def __init__(self):
 
-
         self.n = 2
         self.boards = [Game_2048() for _ in range(self.n)]
         self.action_space = spaces.Discrete(4)
@@ -248,11 +247,11 @@ class Game_2048:
             self.board[:, m] = np.concatenate((np.zeros(self.size - newrow.size), newrow))
 
     def swipe(self, action):
-        if(action == 'a'):
+        if(action == 3):
             self.swipeLeft()
-        elif(action == 'w'):
+        elif(action == 0):
             self.swipeUp()
-        elif(action == 'd'):
+        elif(action == 1):
             self.swipeRight()
         else:
             self.swipeDown()
