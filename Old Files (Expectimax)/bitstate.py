@@ -76,10 +76,15 @@ class Game_2048:
     def bitToBoard(self):
         board = np.zeros(self.size ** 2)
         for k in xrange(self.size ** 2):
+<<<<<<< HEAD
+            board[k] = (self.board >> (4 * k)) & 0xF
+        board =board.reshape((self.size, self.size))
+=======
             board[k] = 1 << ((self.board >> (4 * k)) & 0xF)
             if board[k] == 1:
                 board[k] = 0
         board = board[::-1].reshape((self.size, self.size))
+>>>>>>> 0a90216ca9fb61ab50b61367a88123efec71bf91
         return board
         
     def printBoard(self):
@@ -89,7 +94,7 @@ class Game_2048:
     def countZeros(self):
         count = 0
         for x in xrange(self.size ** 2):
-            i = 0xF << 4 * x
+            i = 0xF << x
             if i & self.board == 0:
                 count+=1
         return count
@@ -97,15 +102,22 @@ class Game_2048:
     def emptyPos(self):
         lst = []
         for x in xrange(self.size ** 2):
-            i = 0xF << 4 * x
+            i = 0xF << x
             if i & self.board == 0:
                 lst.append(x)
         return lst
     
+<<<<<<< HEAD
+    def transpose(self):
+        c1 = self.board & 0xF0F00F0FF0F00F0F
+        c2 = self.board & 0x0000F0F00000F0F0
+        c3 = self.board & 0x0F0F00000F0F0000
+=======
     def transpose(self,board):
         c1 = board & 0xF0F00F0FF0F00F0F
         c2 = board & 0x0000F0F00000F0F0
         c3 = board & 0x0F0F00000F0F0000
+>>>>>>> 0a90216ca9fb61ab50b61367a88123efec71bf91
         c = c1 | (c2 << 12) | (c3 >> 12)
         d1 = c & 0xFF00FF0000FF00FF
         d2 = c & 0x00FF00FF00000000
@@ -125,7 +137,7 @@ class Game_2048:
         if self.randomize:  # turning this off for now
             tileval = 2 if random.random() > 0.8 else 1  # assuming a 4:1 distribution ratio
         else:
-            tileval = 1
+            tileval = 2
             
         id = random.choice(empty_pos)
         self.board += tileval << (4 * id)
@@ -178,11 +190,20 @@ class Game_2048:
         return swipe
 
     def getScore(self):
+<<<<<<< HEAD
+        score = 0
+        for x in xrange(self.size ** 2):
+            val = ((0xF << x) & self.board) >> x
+            if val >= 2:
+                score += (val - 1) * (1 << val)
+        return score
+=======
         row1 = (0xFFFF << 48 & self.board) >> 48
         row2 = (0xFFFF << 32 & self.board) >> 32
         row3 = (0xFFFF << 16 & self.board) >> 16
         row4 = 0xFFFF & self.board
         return self.scoreTable[row1] + self.scoreTable[row2] + self.scoreTable[row3] + self.scoreTable[row4]
+>>>>>>> 0a90216ca9fb61ab50b61367a88123efec71bf91
 
     # should return a list of new boards
     def generateSuccessor(self, action):
@@ -195,9 +216,15 @@ class Game_2048:
             pre_action.swipeRight()
         else:
             pre_action.swipeDown()
+<<<<<<< HEAD
+        empty_pos = self.emptyPos()
+        post_actions = [Game_2048.fromOld(self.board, self.tableL, self.tableR) for i in xrange(len(empty_pos))]
+        for i in xrange(len(post_actions)):
+=======
         empty_pos = pre_action.emptyPos()
         post_actions = [Game_2048(pre_action.board, pre_action.tableL, pre_action.tableR, pre_action.scoreTable) for i in xrange(len(empty_pos))]
         for i in xrange(len(empty_pos)):
+>>>>>>> 0a90216ca9fb61ab50b61367a88123efec71bf91
             emp = empty_pos[i]
             post_actions[i].placeTile(emp)
         return post_actions
@@ -225,6 +252,9 @@ class Game_2048:
         return legalmoves
 
     def isEnd(self):
+<<<<<<< HEAD
+        return len(self.getLegalMoves()) == 0
+=======
         grid = self.bitToBoard()
         for i in range(self.size):
             for j in range(self.size):
@@ -236,6 +266,7 @@ class Game_2048:
                 if i and e == grid[i - 1, j]:
                     return False
         return True
+>>>>>>> 0a90216ca9fb61ab50b61367a88123efec71bf91
 
     def printScore(self):
         print('Current score is %d' % self.score)
