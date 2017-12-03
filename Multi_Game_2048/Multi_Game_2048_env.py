@@ -45,8 +45,11 @@ class MultiGame2048Env(gym.Env):
             prevScore = self.boards[k].score
             self.boards[k].swipe(action)
             reward += self.boards[k].score - prevScore
+            self.boards[k].placeRandomTile()
             if self.boards[k].isEnd(): done = True
             observation += self.boards[k].board.flatten().tolist()
+
+        self.score += (reward / self.n)
 
         return np.asarray([observation]), reward, done, dict()
     
