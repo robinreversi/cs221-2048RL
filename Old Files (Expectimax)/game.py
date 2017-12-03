@@ -21,15 +21,6 @@ def play2048(num_boards):
 
     def evalFn(currentGameState):
         if currentGameState.isEnd():
-<<<<<<< HEAD
-            return float(0)
-        weights = [range(i, i + 4) for i in range(1, 5)]
-        sum = 0.0
-        for i in range(4):
-            for j in range(4):
-                sum += weights[i][j] * currentGameState.bitToBoard()[i,j]
-        return currentGameState.getScore() + sum
-=======
             return float('-inf')
 
         def weightedGrid(currentGameState):
@@ -82,7 +73,6 @@ def play2048(num_boards):
         eval += 50 * openTilePenalty(currentGameState)
 
         return eval
->>>>>>> 0a90216ca9fb61ab50b61367a88123efec71bf91
 
     agent = player.Player(2, evalFn)
     done = False
