@@ -20,12 +20,14 @@ class MultiGame2048Env(gym.Env):
     '''
     A wrapper class acting as an intermediate between the individual boards and game.py
     '''
-    
+    metadata = {'render.modes': ['human', 'ansi']}
     def __init__(self):
+
+
         self.n = 2
-        self.boards = [Game_2048() for _ in xrange(self.n)]
+        self.boards = [Game_2048() for _ in range(self.n)]
         self.action_space = spaces.Discrete(4)
-        self.observation_space = spaces.MultiDiscrete([range(16) for _ in (self.n * 16)])
+        self.observation_space = spaces.MultiDiscrete([range(16) for _ in range(self.n * 16)])
         self.score = 0
         self.legalMoves = set()
         self._seed()
@@ -39,20 +41,25 @@ class MultiGame2048Env(gym.Env):
         """Perform one step of the game. This involves moving and adding a new tile."""
         reward = 0
         done = False
-        observation = np.ndarray()
-        for k in xrange(self.n):
-            prevScore = self.boards[k].getScore()
+        observation = []
+        for k in range(self.n):
+            prevScore = self.boards[k].score
             self.boards[k].swipe(action)
-            reward += self.boards[k].getScore() - prevScore
+            reward += self.boards[k].score - prevScore
             if self.boards[k].isEnd(): done = True
-            observation = np.concatenate(observation,self.boards[k].board.flatten())
-        return observation, reward, done, dict()
+            observation += self.boards[k].board.flatten().tolist()
+
+        return np.asarray([observation]), reward, done, dict()
     
     def _reset(self):
         """Reset the board to begin a new game. Places two random tiles on the board."""
-        self.boards = [Game_2048() for _ in xrange(self.n)]
+        self.boards = [Game_2048() for _ in range(self.n)]
         self.score = 0
         self.legalMoves = set()
+        observation = []
+        for k in range(self.n):
+            observation += self.boards[k].board.flatten().tolist()
+        return np.array([observation])
     
     def _render(self, mode='human', close=False):
         if close:
@@ -60,23 +67,23 @@ class MultiGame2048Env(gym.Env):
         outfile = StringIO() if mode == 'ansi' else sys.stdout
         s = 'Score: {}\n'.format(self.score)
         for board in self.boards:
-            s += "{}\n".format(board)
+            s += "{}\n\n".format(board.board)
         outfile.write(s)
         return outfile
     
     ############### Non-OpenAI Gym functions ###############
     
     def updateScore(self):
-        self.score = sum(self.boards[k].score for k in xrange(self.n)) / float(self.n)
+        self.score = sum(self.boards[k].score for k in range(self.n)) / float(self.n)
 
     def updateLegalMoves(self):
         legalMoves = self.boards[0].legalMoves
-        for k in xrange(1, self.n):
+        for k in range(1, self.n):
             legalMoves = set.union(legalMoves, self.boards[k].legalMoves)
         self.legalMoves = legalMoves
 
     def isEnd(self):
-        for k in xrange(self.n):
+        for k in range(self.n):
             if self.boards[k].isEnd(): return True
         return False
 
@@ -89,11 +96,11 @@ class MultiGame2048Env(gym.Env):
         return self.legalMoves
 
     def swipe(self, swipe):
-        for k in xrange(self.n):
+        for k in range(self.n):
             self.boards[k].swipe(swipe)
 
     def updateBoard(self):
-        for k in xrange(self.n):
+        for k in range(self.n):
             self.boards[k].placeRandomTile()
             self.boards[k].printScore()
             self.boards[k].printBoard()
@@ -190,12 +197,12 @@ class Game_2048:
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1):
+            for i in range(row.size - 1):
                 if rowlist[i] == rowlist[i + 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
                     rowlist[i + 1] = 0
-            newrow = np.array(filter(lambda x: x != 0, rowlist))
+            newrow = np.array([ x for x in rowlist if x!= 0])
             self.board[m, :] = np.concatenate((newrow, np.zeros(self.size - newrow.size)))
 
     def swipeRight(self):
@@ -204,12 +211,12 @@ class Game_2048:
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1, 0, -1):
+            for i in range(row.size - 1, 0, -1):
                 if rowlist[i] == rowlist[i - 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
                     rowlist[i - 1] = 0
-            newrow = np.array(filter(lambda x: x != 0, rowlist))
+            newrow = np.array([ x for x in rowlist if x!= 0])
             self.board[m, :] = np.concatenate((np.zeros(self.size - newrow.size), newrow))
 
     def swipeUp(self):
@@ -218,12 +225,12 @@ class Game_2048:
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1):
+            for i in range(row.size - 1):
                 if rowlist[i] == rowlist[i + 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
                     rowlist[i + 1] = 0
-            newrow = np.array(filter(lambda x: x != 0, rowlist))
+            newrow = np.array([ x for x in rowlist if x!= 0])
             self.board[:, m] = np.concatenate((newrow, np.zeros(self.size - newrow.size)))
 
     def swipeDown(self):
@@ -232,13 +239,23 @@ class Game_2048:
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1, 0, -1):
+            for i in range(row.size - 1, 0, -1):
                 if rowlist[i] == rowlist[i - 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
                     rowlist[i - 1] = 0
-            newrow = np.array(filter(lambda x: x != 0, rowlist))
+            newrow = np.array([ x for x in rowlist if x!= 0])
             self.board[:, m] = np.concatenate((np.zeros(self.size - newrow.size), newrow))
+
+    def swipe(self, action):
+        if(action == 'a'):
+            self.swipeLeft()
+        elif(action == 'w'):
+            self.swipeUp()
+        elif(action == 'd'):
+            self.swipeRight()
+        else:
+            self.swipeDown()
 
     """
     '''
@@ -265,15 +282,7 @@ class Game_2048:
             post_actions[i].placeTile(row, col)
         return post_actions
 
-    def swipe(self, action):
-        if(action == 'a'):
-            self.swipeLeft()
-        elif(action == 'w'):
-            self.swipeUp()
-        elif(action == 'd'):
-            self.swipeRight()
-        else:
-            self.swipeDown()
+    
 
     def copy(self):
         return copy.deepcopy(self)
