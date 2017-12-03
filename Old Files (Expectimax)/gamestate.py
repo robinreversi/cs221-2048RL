@@ -12,22 +12,22 @@ class Multi_Game_2048:
 
     def __init__(self, n):
         self.n = n
-        self.boards = [Game_2048() for _ in xrange(self.n)]
+        self.boards = [Game_2048() for _ in range(self.n)]
         self.score = 0
         self.legalMoves = set()
 
     def updateScore(self):
-        self.score = sum(self.boards[k].score for k in xrange(self.n)) / float(self.n)
+        self.score = sum(self.boards[k].score for k in range(self.n)) / float(self.n)
 
     def updateLegalMoves(self):
         legalMoves = self.boards[0].legalMoves
-        for k in xrange(1, self.n):
+        for k in range(1, self.n):
             legalMoves = set.union(legalMoves, self.boards[k].legalMoves)
         self.legalMoves = legalMoves
 
 
     def isEnd(self):
-        for k in xrange(self.n):
+        for k in range(self.n):
             if self.boards[k].isEnd(): return True
         return False
 
@@ -40,11 +40,11 @@ class Multi_Game_2048:
         return self.legalMoves
 
     def swipe(self, swipe):
-        for k in xrange(self.n):
+        for k in range(self.n):
             self.boards[k].swipe(swipe)
 
     def updateBoard(self):
-        for k in xrange(self.n):
+        for k in range(self.n):
             self.boards[k].placeRandomTile()
             self.boards[k].printScore()
             self.boards[k].printBoard()
@@ -99,7 +99,7 @@ class Game_2048:
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1):
+            for i in range(row.size - 1):
                 if rowlist[i] == rowlist[i + 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
@@ -113,7 +113,7 @@ class Game_2048:
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1, 0, -1):
+            for i in range(row.size - 1, 0, -1):
                 if rowlist[i] == rowlist[i - 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
@@ -127,7 +127,7 @@ class Game_2048:
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1):
+            for i in range(row.size - 1):
                 if rowlist[i] == rowlist[i + 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
@@ -141,7 +141,7 @@ class Game_2048:
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1, 0, -1):
+            for i in range(row.size - 1, 0, -1):
                 if rowlist[i] == rowlist[i - 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
@@ -203,10 +203,9 @@ class Game_2048:
             post_action.swipeDown()
         for row in range(self.size):
             for col in range(self.size):
-                if post_action.board[row, col] == 0:
+                if post_action.board[row, col] == 0 and random.random() > .5:
                     post_action.placeTile(row, col)
         return post_action
-        
         
     def swipe(self, action):
         if(action == 'a'):
@@ -265,7 +264,7 @@ class Game_2048:
 ############################################################
 
 def playNGames2048(n):
-    games = [Game_2048() for _ in xrange(n)]
+    games = [Game_2048() for _ in range(n)]
     numMoves = 0
 
     print('Welcome to n-2048!')
@@ -278,7 +277,7 @@ def playNGames2048(n):
         if games[k].isEnd():
             print('Game over at board %d!' % k)
             games[k].printBoard()
-            score = sum(games[_].score for _ in xrange(n))
+            score = sum(games[_].score for _ in range(n))
             print('Your score is %2.f!' % (score / float(n)))
             print('Your number of moves is %d' % numMoves)
             return True
@@ -290,7 +289,7 @@ def playNGames2048(n):
         return allLegalMoves
 
     while 1:
-        for k in xrange(n):
+        for k in range(n):
             games[k].placeRandomTile()
             games[k].printBoard()
             games[k].getLegalMoves()
@@ -304,7 +303,7 @@ def playNGames2048(n):
             if swipe in allLegalMoves: break
             else: print("Please enter a valid move!")
 
-        for k in xrange(n):
+        for k in range(n):
             games[k].getMove(swipe)
 
         numMoves += 1
