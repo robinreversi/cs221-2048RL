@@ -64,14 +64,6 @@ class gameutil:
                         self.scoreTable[key] = score
 
     def getScore(self, board):
-        '''
-        score = 0
-        for x in xrange(self.size ** 2):
-            val = ((0xF << x) & self.board) >> x
-            if val >= 2:
-                score += (val - 1) * (1 << val)
-        return score
-        '''
         row1 = (0xFFFF << 48 & board) >> 48
         row2 = (0xFFFF << 32 & board) >> 32
         row3 = (0xFFFF << 16 & board) >> 16

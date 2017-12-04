@@ -2,7 +2,6 @@ import collections, random, operator
 import matplotlib.pyplot as plt
 import numpy as np
 import player
-import matplotlib.pyplot as plot
 import gameutil
 import time
 
