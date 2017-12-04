@@ -112,18 +112,18 @@ def play2048(num_boards,util):
         for key in values:
             values[move] /= count[move]
         action = max(values.items(), key=operator.itemgetter(1))[0]
-        for game in games:
+        for i in range(NUM_BOARDS):
             print("Action: ",action)
-            game = util.swipe(action, game)
-            print(bitToBoard(game))
-            game = util.placeRandomTile(game)
+            games[i] = util.swipe(action, games[i])
+            print(bitToBoard(games[i]))
+            games[i] = util.placeRandomTile(games[i])
             
-            score = util.getScore(game)
+            score = util.getScore(games[i])
             print ("Score: ", score)
-            if util.isEnd(game):
+            if util.isEnd(games[i]):
                 total += score
-                highest_tile.append(util.getHighest(game))
-                games.remove(game)
+                highest_tile.append(util.getHighest(games[i]))
+                games.remove(games[i])
         if float(len(games)) < float(1 * num_boards):
             for game in games:
                 total += util.getScore(game)

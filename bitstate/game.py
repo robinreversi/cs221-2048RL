@@ -146,9 +146,10 @@ def play2048(num_boards,uti):
         action = max(values.items(), key=operator.itemgetter(1))[0]
         for game in games:
             print("Action: ",action)
-            game.swipe(action)
+            changed = game.swipe(action)
+            if(changed):
+                game.placeRandomTile()
             print(bitToBoard(game.board))
-            game.placeRandomTile()
             print ("Score: ",game.getScore())
             score = game.getScore()
             if game.isEnd():

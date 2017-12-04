@@ -205,6 +205,7 @@ class Game_2048:
         return post_actions
 
     def swipe(self, action):
+        pre_board = self.board
         if(action == 3):
             self.swipeLeft()
         elif(action == 0):
@@ -213,6 +214,7 @@ class Game_2048:
             self.swipeRight()
         else:
             self.swipeDown()
+        return pre_board != self.board
 
     def copy(self):
         return copy.deepcopy(self)
