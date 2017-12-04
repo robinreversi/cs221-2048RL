@@ -118,12 +118,12 @@ def main():
     score = 0
     lst = []
     dict = collections.defaultdict(int)
-    for i in range(5):
-        curr_score,highest = play2048(1)
+    for i in range(8):
+        curr_score,highest = play2048(2)
         score += curr_score
         lst.append(highest)
         dict[max(highest)] += 1
-    print ("Average: ", score / 5.0)
+    print ("Average: ", score / 8.0)
     for i in lst:
         print("Highest tile for all board: ",i)
         print("Highest tile for 1 board: ",max(i))
