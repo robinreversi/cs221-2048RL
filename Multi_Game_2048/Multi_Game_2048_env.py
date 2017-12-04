@@ -55,7 +55,7 @@ class MultiGame2048Env(gym.Env):
             reward += util.getScore(self.boards[k]) - prevScore
             if util.isEnd(self.boards[k]):
                 done = True
-            observation += util.bitToBoard(self.boards[k]).flatten().tolist()
+            observation += util.bitToBoardPower(self.boards[k]).flatten().tolist()
 
         self.score += (reward / self.n)
 

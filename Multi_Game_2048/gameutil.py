@@ -217,6 +217,12 @@ class gameutil:
                 cboard[k] = 0
         return cboard[::-1].reshape((4, 4))
 
+    def bitToBoardPower(self, board):
+        cboard = np.zeros(16)
+        for k in range(16):
+            cboard[k] = ((board >> (4 * k)) & 0xF)
+        return cboard[::-1].reshape((4, 4))
+
     def smoothness(self, board):
         sm = 0.0
         for r in range(4):
