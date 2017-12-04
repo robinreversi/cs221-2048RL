@@ -62,7 +62,6 @@ class Game_2048:
         self.board = np.zeros((self.size, self.size)).astype(int)
         self.score = 0
         self.options = ['a', 's', 'd', 'w']
-        self.legalMoves = set()
         self.placeRandomTile()
 
     '''
@@ -78,6 +77,13 @@ class Game_2048:
     def countZeros(self):
         return np.count_nonzero(self.board == 0)
 
+    def getEmptySquares(self):
+        return [(row, col) for row in range(self.size) for col in range(self.size) if self.board[row, col] == 0]
+
+    def countMerges(self):
+        vertical = sum(sum(self.board[i] == self.board[i + 1]) for i in range(self.size - 1))
+        horizontal = sum(sum(self.board[:, i] == self.board[:, i + 1] for i in range(self.size - 1)))
+        return vertical + horizontal - self.countZeros()
     '''
     ----------------------
     GAME RUNNING FUNCTIONS
@@ -85,13 +91,15 @@ class Game_2048:
     ''' 
     def placeRandomTile(self):
         if self.countZeros() == 0: return
-        empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if self.board[row, col] == 0]
+        empty_pos = self.getEmptySquares()
         tileval = 4 if random.random() > 0.8 else 2  # assuming a 4:1 distribution ratio
         row, col = random.choice(empty_pos)
         self.board[row, col] = tileval
 
     def placeTile(self, row, col):
         self.board[row][col] = 2
+
+    
 
     def swipeLeft(self):
         for m in range(self.size):
@@ -203,11 +211,12 @@ class Game_2048:
             post_action.swipeDown()
         for row in range(self.size):
             for col in range(self.size):
-                if post_action.board[row, col] == 0 and random.random() < .8:
+                if post_action.board[row, col] == 0:
                     post_action.placeTile(row, col)
         return post_action
         
     def swipe(self, action):
+        #prev_board = self.board
         if(action == 'a'):
             self.swipeLeft()
         elif(action == 'w'):
@@ -216,45 +225,25 @@ class Game_2048:
             self.swipeRight()
         else:
             self.swipeDown()
+        #return sum(sum(prev_board == self.board)) > 0
 
     def copy(self):
         return copy.deepcopy(self)
 
     def getLegalMoves(self):
-        self.legalMoves = set()
-        if self.countZeros() > 0:
-            for row in range(self.size):
-                for col in range(self.size):
-                    if self.board[row, col] == 0:
-                        def checkNeighbors(self, row, col):
-                            if row - 1 in range(self.size) and self.board[row - 1, col] > 0:
-                                self.legalMoves.update('s')
-                            if row + 1 in range(self.size) and self.board[row + 1, col] > 0:
-                                self.legalMoves.update('w')
-                            if col - 1 in range(self.size) and self.board[row, col - 1] > 0:
-                                self.legalMoves.update('d')
-                            if col + 1 in range(self.size) and self.board[row, col + 1] > 0:
-                                self.legalMoves.update('a')
-                        checkNeighbors(self, row, col)
-
-        # Check for horizontal matches
-        for row in range(self.size):
-            for col in range(self.size - 1):
-                if self.board[row, col] == self.board[row, col + 1] != 0:
-                    self.legalMoves.update('a', 'd')
-                    break
-
-        # Check for vertical matches
-        for row in range(self.size - 1):
-            for col in range(self.size):
-                if self.board[row, col] == self.board[row + 1, col] != 0:
-                    self.legalMoves.update('s', 'w')
-                    break
-
-        return self.legalMoves
+        return self.options
 
     def isEnd(self):
-        return len(self.getLegalMoves()) == 0
+        for i in range(self.size):
+            for j in range(self.size):
+                e = self.board[i, j]
+                if not e:
+                    return False
+                if j and e == self.board[i, j - 1]:
+                    return False
+                if i and e == self.board[i - 1, j]:
+                    return False
+        return True
 
     def printScore(self):
         print('Current score is %d' % self.score)

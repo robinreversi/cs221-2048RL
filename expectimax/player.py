@@ -10,8 +10,9 @@ class Player:
 
     def getAction(self, gameState):
         def V(gameState, depth, evalFn):
-            
+
             legalMoves = list(gameState.getLegalMoves())
+
             if(gameState.isEnd()):
                 return (gameState.getScore(), 'w')
             elif(depth == 0):
