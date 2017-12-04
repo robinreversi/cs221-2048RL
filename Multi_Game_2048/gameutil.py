@@ -130,7 +130,7 @@ class gameutil:
     def countZeros(self, board):
         count = 0
         for k in range(16):
-            count += (getTile(board, k) == 0.0)
+            count += (self.getTile(board, k) == 0.0)
         return count
 
     def swipeLeft(self, board):
@@ -208,4 +208,10 @@ class gameutil:
             cboard[k] = 1 << ((board >> (4 * k)) & 0xF)
             if cboard[k] == 1:
                 cboard[k] = 0
+        return cboard[::-1].reshape((4, 4))
+
+    def bitToBoardPower(self, board):
+        cboard = np.zeros(16)
+        for k in range(16):
+            cboard[k] = ((board >> (4 * k)) & 0xF)
         return cboard[::-1].reshape((4, 4))
