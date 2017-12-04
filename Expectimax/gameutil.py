@@ -5,6 +5,10 @@ class gameutil:
     def __init__(self):
         self.size = 4
         self.initTables()
+        self.weights1 = [7,6,5,4,6,5,4,3,5,4,3,2,4,3,2,1]
+        self.weights2 = [4,5,6,7,3,4,5,6,2,3,4,5,1,2,3,4]
+        self.weights3 = [1,2,3,4,2,3,4,5,3,4,5,6,4,5,6,7]
+        self.weights4 = [4,3,2,1,5,4,3,2,6,5,4,3,7,6,5,4]
 
     def newBoard(self):
         return 1 << (4 * rand.randint(0,15))
@@ -126,12 +130,13 @@ class gameutil:
 
 
     def getTile(self, board, k):
-        return 1 << (0xF & (board >> (4 * k)))
+        x = 1 << (0xF & (board >> (4 * k)))
+        return x if x > 1 else 0
 
     def countZeros(self, board):
         count = 0
         for k in range(16):
-            count += (self.getTile(board, k) == 0.0)
+            count += int(self.getTile(board, k) == 0)
         return count
 
 
@@ -205,9 +210,65 @@ class gameutil:
         return highest
 
     def bitToBoard(self, board):
-        cboard = np.zeros(16)
+        cboard = np.zeros(16).astype(int)
         for k in range(16):
             cboard[k] = 1 << ((board >> (4 * k)) & 0xF)
             if cboard[k] == 1:
                 cboard[k] = 0
         return cboard[::-1].reshape((4, 4))
+
+    def smoothness(self, board):
+        sm = 0.0
+        for r in range(4):
+            for k in range(3):
+                sm += abs(self.getTile(board, 4 * r + k) - self.getTile(board, 4 * r + k + 1))
+
+        for c in range(4):
+            for k in range(3):
+                sm += abs(self.getTile(board, 4 * k + c) - self.getTile(board, 4 * (k+1) + c))
+
+        return -sm  # penalize high disparity
+
+    def openTilePenalty(self, board, n=5):
+        #return util.countZeros(board) - n
+        return -((self.countZeros(board) - n) ** 2)
+
+    def weightedGrid(self, board):
+        sum1 = 0.0
+        sum2 = 0.0
+        sum3 = 0.0
+        sum4 = 0.0
+        for i in range(16):
+            val = 1 << ((board >> (4 * i)) & 0xF)
+            if val > 1:
+                sum1 += self.weights1[i] * val
+                sum2 += self.weights2[i] * val
+                sum3 += self.weights3[i] * val
+                sum4 += self.weights4[i] * val
+        return max(sum1, sum2, sum3, sum4)
+
+    def evalFn(self, board, isEnd, score):
+        if isEnd:
+            return float('-inf')
+
+        eval = 0.0
+        eval += score
+        eval += self.weightedGrid(board)
+        #eval += monotonicity(currentGameState, k=10.0)
+        #eval += 10 * openTilePenalty(currentGameState)
+        eval += 2 * self.smoothness(board)
+
+        return eval
+
+    def direness(self, board):
+        return np.exp(-self.smoothness(board) / (self.countZeros(board) + .5))
+
+    def convertToText(self, action):
+        if(action == 0):
+            return 'Up'
+        elif(action == 1):
+            return 'Right'
+        elif(action == 2):
+            return 'Down'
+        else:
+            return 'Left'
