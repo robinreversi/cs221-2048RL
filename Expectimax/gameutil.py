@@ -261,7 +261,7 @@ class gameutil:
         return eval
 
     def direness(self, board):
-        return np.exp(-self.smoothness(board) / (self.countZeros(board) + .5))
+        return (-self.smoothness(board) / 100.0 / (self.countZeros(board) + .5)) ** 3
 
     def convertToText(self, action):
         if(action == 0):
