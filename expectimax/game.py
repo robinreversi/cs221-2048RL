@@ -7,9 +7,11 @@ import player
 import matplotlib.pyplot as plot
 import time
 
-DEPTH = 3
+DEPTH = 2
 NUM_BOARDS = 1
-NUM_GAMES = 10
+NUM_GAMES = 100
+
+
 
 def play2048(num_boards):
     games = [gamestate.Game_2048() for _ in range(num_boards)]
@@ -21,7 +23,7 @@ def play2048(num_boards):
 
     def evalFn(currentGameState):
         if currentGameState.isEnd():
-            return float('-inf')
+            return 1
 
         def weightedGrid(currentGameState):
             sum1 = 0.0
@@ -83,19 +85,18 @@ def play2048(num_boards):
         values = collections.defaultdict(float)
         count = collections.defaultdict(float)
         for game in games:
-            start = time.time()
+            #start = time.time()
             action,vals = agent.getAction(game.copy())
-            end = time.time()
-            print("Time: ", end - start)
-            print("Action: " + str(action))
+
             for move,score in vals:
-                values[move] += score
+                values[move] += score * np.exp(5.0 / (game.countZeros() + .5))
                 count[move] += 1
         for key in values:
             values[move] /= count[move]
         action = max(values.iteritems(), key=operator.itemgetter(1))[0]
         for game in games:
-            game.swipe(action)
+            changed = game.swipe(action)
+            #if(changed):
             game.placeRandomTile()
             game.printBoard()
             print ("Score: ",game.getScore())
@@ -108,7 +109,7 @@ def play2048(num_boards):
                 total += game.getScore()
                 highest_tile.append(game.getHighest())
             done = True
-    return total / float(num_boards),highest_tile
+    return total / float(num_boards), highest_tile
 
 
 
@@ -116,17 +117,22 @@ def play2048(num_boards):
 
 def main():
     score = 0
+    scores = []
     lst = []
     dict = collections.defaultdict(int)
     for i in range(NUM_GAMES):
-        curr_score,highest = play2048(NUM_BOARDS)
+        curr_score, highest = play2048(NUM_BOARDS)
         score += curr_score
+        scores.append(curr_score)
         lst.append(highest)
         dict[max(highest)] += 1
+    avg = score / float(NUM_GAMES)
+    var = sum([(score - avg)** 2 for score in scores])
     print ("Average: ", score / float(NUM_GAMES))
+    print ("Variance: ", var)
     for i in lst:
-        print("Highest tile for all board: ",i)
-        print("Highest tile for 1 board: ",max(i))
+        print("Highest tile for all board: ", lst[0])
+        print("Highest tile for 1 board: ", max(i))
     print dict
     '''
     averages = []

@@ -1,5 +1,4 @@
 import collections, random, operator
-import bitstate
 import matplotlib.pyplot as plt
 import numpy as np
 import player
@@ -8,11 +7,7 @@ import gameutil
 import time
 
 DEPTH = 2
-<<<<<<< HEAD
 NUM_BOARDS = 1
-=======
-NUM_BOARDS = 2
->>>>>>> 19a0d7a6e43fa08b4a33a396859e1d1354fc9eef
 NUM_GAMES = 10
 
 def bitToBoard(board):
@@ -23,33 +18,17 @@ def bitToBoard(board):
             cboard[k] = 0
     return cboard[::-1].reshape((4, 4))
 
-def play2048(num_boards,uti):
-    games = [bitstate.Game_2048(0,uti.tableL,uti.tableR,uti.scoreTable) for _ in range(num_boards)]
+def play2048(num_boards,util):
+    games = [util.newBoard() for _ in range(num_boards)]
     # game = gamestate.Multi_Game_2048(4)
-<<<<<<< HEAD
-    weights1 = [range(i,i+4) for i in range(1,5)]
-    weights2 = [range(i+3, i-1,-1) for i in range(1, 5)]
-    weights3 = [range(i+3, i-1,-1) for i in range(4, 0,-1)]
-    weights4 = [range(i, i + 4) for i in range(4, 0,-1)]
 
-    def evalFn(currentGameState):
-        if currentGameState.isEnd():
-=======
     weights1 = [7,6,5,4,6,5,4,3,5,4,3,2,4,3,2,1]
     weights2 = [4,5,6,7,3,4,5,6,2,3,4,5,1,2,3,4]
     weights3 = [1,2,3,4,2,3,4,5,3,4,5,6,4,5,6,7]
     weights4 = [4,3,2,1,5,4,3,2,6,5,4,3,7,6,5,4]
-    '''
-    for i in range(1,5):
-        weights1 += range(i,i+4)
-        weights2 += range(i+3, i-1,-1)
-    for i in range(4,0,-1):
-        weights3 += range(i+3, i-1,-1)
-        weights4 += range(i, i + 4)
-    '''
+
     def evalFn(currentGameState, isEnd, score):
         if isEnd:
->>>>>>> 19a0d7a6e43fa08b4a33a396859e1d1354fc9eef
             return float('-inf')
 
         def countZeros(board):
@@ -67,15 +46,6 @@ def play2048(num_boards,uti):
             sum2 = 0.0
             sum3 = 0.0
             sum4 = 0.0
-<<<<<<< HEAD
-            for i in range(4):
-                for j in range(4):
-                    sum1 += weights1[i][j] * currentGameState.board[i, j]
-                    sum2 += weights2[i][j] * currentGameState.board[i, j]
-                    sum3 += weights3[i][j] * currentGameState.board[i, j]
-                    sum4 += weights4[i][j] * currentGameState.board[i, j]
-=======
-            #print(bitToBoard(currentGameState))
             for i in range(16):
                 val = 1 << ((currentGameState >> (4 * i)) & 0xF)
                 if val > 1:
@@ -83,7 +53,6 @@ def play2048(num_boards,uti):
                     sum2 += weights2[i] * val
                     sum3 += weights3[i] * val
                     sum4 += weights4[i] * val
->>>>>>> 19a0d7a6e43fa08b4a33a396859e1d1354fc9eef
             return max(sum1, sum2, sum3, sum4)
 
         def monotonicity(cGS, k=10.0):
@@ -124,7 +93,7 @@ def play2048(num_boards,uti):
 
         return eval
 
-    agent = player.Player(DEPTH, evalFn, uti)
+    agent = player.Player(DEPTH, evalFn, util)
     done = False
     total = 0.0
     moves = 0
@@ -134,11 +103,11 @@ def play2048(num_boards,uti):
         count = collections.defaultdict(float)
         for game in games:
             start = time.time()
-            action,vals = agent.getAction(game.board)
+            action, vals = agent.getAction(game)
             end = time.time()
             print("Time: ", end - start)
             print("Action: " + str(action))
-            for move,score in vals:
+            for move, score in vals:
                 values[move] += score
                 count[move] += 1
         for key in values:
@@ -146,20 +115,20 @@ def play2048(num_boards,uti):
         action = max(values.items(), key=operator.itemgetter(1))[0]
         for game in games:
             print("Action: ",action)
-            changed = game.swipe(action)
-            if(changed):
-                game.placeRandomTile()
-            print(bitToBoard(game.board))
-            print ("Score: ",game.getScore())
-            score = game.getScore()
-            if game.isEnd():
-                total += game.getScore()
-                highest_tile.append(game.getHighest())
+            game = util.swipe(action, game)
+            print(bitToBoard(game))
+            game = util.placeRandomTile(game)
+            
+            score = util.getScore(game)
+            print ("Score: ", score)
+            if util.isEnd(game):
+                total += score
+                highest_tile.append(util.getHighest(game))
                 games.remove(game)
         if float(len(games)) < float(1 * num_boards):
             for game in games:
-                total += game.getScore()
-                highest_tile.append(game.getHighest())
+                total += util.getScore(game)
+                highest_tile.append(util.getHighest(game))
             done = True
     return total / float(num_boards),highest_tile
 
@@ -170,26 +139,19 @@ def play2048(num_boards,uti):
 def main():
     score = 0
     lst = []
-<<<<<<< HEAD
-    dictA = collections.defaultdict(int)
-=======
-    dict = collections.defaultdict(int)
-    uti = gameutil.gameutil()
->>>>>>> 19a0d7a6e43fa08b4a33a396859e1d1354fc9eef
+    counter = collections.defaultdict(int)
+    util = gameutil.gameutil()
     for i in range(NUM_GAMES):
-        curr_score,highest = play2048(NUM_BOARDS, uti)
+        curr_score,highest = play2048(NUM_BOARDS, util)
         score += curr_score
         lst.append(highest)
-        dictA[max(highest)] += 1
+        counter[max(highest)] += 1
     print ("Average: ", score / float(NUM_GAMES))
     for i in lst:
         print("Highest tile for all board: ",i)
         print("Highest tile for 1 board: ",max(i))
-<<<<<<< HEAD
-    print(dictA)
-=======
-    print(dict)
->>>>>>> 19a0d7a6e43fa08b4a33a396859e1d1354fc9eef
+    print(counter)
+
     '''
     averages = []
     for board_size in range(2,9):

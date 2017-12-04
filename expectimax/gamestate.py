@@ -12,22 +12,22 @@ class Multi_Game_2048:
 
     def __init__(self, n):
         self.n = n
-        self.boards = [Game_2048() for _ in xrange(self.n)]
+        self.boards = [Game_2048() for _ in range(self.n)]
         self.score = 0
         self.legalMoves = set()
 
     def updateScore(self):
-        self.score = sum(self.boards[k].score for k in xrange(self.n)) / float(self.n)
+        self.score = sum(self.boards[k].score for k in range(self.n)) / float(self.n)
 
     def updateLegalMoves(self):
         legalMoves = self.boards[0].legalMoves
-        for k in xrange(1, self.n):
+        for k in range(1, self.n):
             legalMoves = set.union(legalMoves, self.boards[k].legalMoves)
         self.legalMoves = legalMoves
 
 
     def isEnd(self):
-        for k in xrange(self.n):
+        for k in range(self.n):
             if self.boards[k].isEnd(): return True
         return False
 
@@ -40,11 +40,11 @@ class Multi_Game_2048:
         return self.legalMoves
 
     def swipe(self, swipe):
-        for k in xrange(self.n):
+        for k in range(self.n):
             self.boards[k].swipe(swipe)
 
     def updateBoard(self):
-        for k in xrange(self.n):
+        for k in range(self.n):
             self.boards[k].placeRandomTile()
             self.boards[k].printScore()
             self.boards[k].printBoard()
@@ -62,7 +62,6 @@ class Game_2048:
         self.board = np.zeros((self.size, self.size)).astype(int)
         self.score = 0
         self.options = ['a', 's', 'd', 'w']
-        self.legalMoves = set()
         self.placeRandomTile()
 
     '''
@@ -78,6 +77,13 @@ class Game_2048:
     def countZeros(self):
         return np.count_nonzero(self.board == 0)
 
+    def getEmptySquares(self):
+        return [(row, col) for row in range(self.size) for col in range(self.size) if self.board[row, col] == 0]
+
+    def countMerges(self):
+        vertical = sum(sum(self.board[i] == self.board[i + 1]) for i in range(self.size - 1))
+        horizontal = sum(sum(self.board[:, i] == self.board[:, i + 1] for i in range(self.size - 1)))
+        return vertical + horizontal - self.countZeros()
     '''
     ----------------------
     GAME RUNNING FUNCTIONS
@@ -85,7 +91,7 @@ class Game_2048:
     ''' 
     def placeRandomTile(self):
         if self.countZeros() == 0: return
-        empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if self.board[row, col] == 0]
+        empty_pos = self.getEmptySquares()
         tileval = 4 if random.random() > 0.8 else 2  # assuming a 4:1 distribution ratio
         row, col = random.choice(empty_pos)
         self.board[row, col] = tileval
@@ -93,13 +99,15 @@ class Game_2048:
     def placeTile(self, row, col):
         self.board[row][col] = 2
 
+    
+
     def swipeLeft(self):
         for m in range(self.size):
             row = self.board[m, :]
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1):
+            for i in range(row.size - 1):
                 if rowlist[i] == rowlist[i + 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
@@ -113,7 +121,7 @@ class Game_2048:
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1, 0, -1):
+            for i in range(row.size - 1, 0, -1):
                 if rowlist[i] == rowlist[i - 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
@@ -127,7 +135,7 @@ class Game_2048:
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1):
+            for i in range(row.size - 1):
                 if rowlist[i] == rowlist[i + 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
@@ -141,7 +149,7 @@ class Game_2048:
             if sum(row) == 0: continue
             row = row[row != 0]
             rowlist = row.tolist()
-            for i in xrange(row.size - 1, 0, -1):
+            for i in range(row.size - 1, 0, -1):
                 if rowlist[i] == rowlist[i - 1]:
                     rowlist[i] *= 2
                     self.score += rowlist[i]
@@ -207,8 +215,8 @@ class Game_2048:
                     post_action.placeTile(row, col)
         return post_action
         
-        
     def swipe(self, action):
+        #prev_board = self.board
         if(action == 'a'):
             self.swipeLeft()
         elif(action == 'w'):
@@ -217,45 +225,25 @@ class Game_2048:
             self.swipeRight()
         else:
             self.swipeDown()
+        #return sum(sum(prev_board == self.board)) > 0
 
     def copy(self):
         return copy.deepcopy(self)
 
     def getLegalMoves(self):
-        self.legalMoves = set()
-        if self.countZeros() > 0:
-            for row in range(self.size):
-                for col in range(self.size):
-                    if self.board[row, col] == 0:
-                        def checkNeighbors(self, row, col):
-                            if row - 1 in range(self.size) and self.board[row - 1, col] > 0:
-                                self.legalMoves.update('s')
-                            if row + 1 in range(self.size) and self.board[row + 1, col] > 0:
-                                self.legalMoves.update('w')
-                            if col - 1 in range(self.size) and self.board[row, col - 1] > 0:
-                                self.legalMoves.update('d')
-                            if col + 1 in range(self.size) and self.board[row, col + 1] > 0:
-                                self.legalMoves.update('a')
-                        checkNeighbors(self, row, col)
-
-        # Check for horizontal matches
-        for row in range(self.size):
-            for col in range(self.size - 1):
-                if self.board[row, col] == self.board[row, col + 1] != 0:
-                    self.legalMoves.update('a', 'd')
-                    break
-
-        # Check for vertical matches
-        for row in range(self.size - 1):
-            for col in range(self.size):
-                if self.board[row, col] == self.board[row + 1, col] != 0:
-                    self.legalMoves.update('s', 'w')
-                    break
-
-        return self.legalMoves
+        return self.options
 
     def isEnd(self):
-        return len(self.getLegalMoves()) == 0
+        for i in range(self.size):
+            for j in range(self.size):
+                e = self.board[i, j]
+                if not e:
+                    return False
+                if j and e == self.board[i, j - 1]:
+                    return False
+                if i and e == self.board[i - 1, j]:
+                    return False
+        return True
 
     def printScore(self):
         print('Current score is %d' % self.score)
@@ -265,7 +253,7 @@ class Game_2048:
 ############################################################
 
 def playNGames2048(n):
-    games = [Game_2048() for _ in xrange(n)]
+    games = [Game_2048() for _ in range(n)]
     numMoves = 0
 
     print('Welcome to n-2048!')
@@ -278,7 +266,7 @@ def playNGames2048(n):
         if games[k].isEnd():
             print('Game over at board %d!' % k)
             games[k].printBoard()
-            score = sum(games[_].score for _ in xrange(n))
+            score = sum(games[_].score for _ in range(n))
             print('Your score is %2.f!' % (score / float(n)))
             print('Your number of moves is %d' % numMoves)
             return True
@@ -290,7 +278,7 @@ def playNGames2048(n):
         return allLegalMoves
 
     while 1:
-        for k in xrange(n):
+        for k in range(n):
             games[k].placeRandomTile()
             games[k].printBoard()
             games[k].getLegalMoves()
@@ -304,7 +292,7 @@ def playNGames2048(n):
             if swipe in allLegalMoves: break
             else: print("Please enter a valid move!")
 
-        for k in xrange(n):
+        for k in range(n):
             games[k].getMove(swipe)
 
         numMoves += 1

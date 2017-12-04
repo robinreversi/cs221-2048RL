@@ -174,7 +174,7 @@ class Game_2048:
     def getScore(self):
         '''
         score = 0
-        for x in xrange(self.size ** 2):
+        for x in range(self.size ** 2):
             val = ((0xF << x) & self.board) >> x
             if val >= 2:
                 score += (val - 1) * (1 << val)
