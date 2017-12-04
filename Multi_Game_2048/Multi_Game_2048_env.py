@@ -1,6 +1,11 @@
 import gym
 from gym import spaces
 from gym.utils import seeding
+import copy
+
+from Multi_Game_2048 import gameutil
+
+util = gameutil.gameutil()
 
 import numpy as np
 import random
@@ -24,7 +29,7 @@ class MultiGame2048Env(gym.Env):
     def __init__(self):
 
         self.n = 2
-        self.boards = [Game_2048() for _ in range(self.n)]
+        self.boards = [util.newBoard() for _ in range(self.n)]
         self.action_space = spaces.Discrete(4)
         self.observation_space = spaces.MultiDiscrete([range(16) for _ in range(self.n * 16)])
         self.score = 0
@@ -42,22 +47,28 @@ class MultiGame2048Env(gym.Env):
         done = False
         observation = []
         for k in range(self.n):
-            prevScore = self.boards[k].score
-            self.boards[k].swipe(action)
-            reward += self.boards[k].score - prevScore
-            if self.boards[k].isEnd(): done = True
-            observation += self.boards[k].board.flatten().tolist()
+            prevScore = util.getScore(self.boards[k])
+            prevBoard = self.boards[k]
+            self.boards[k] = util.swipe(action, self.boards[k])
+            if prevBoard != self.boards[k]:
+                self.boards[k] = util.placeRandomTile(self.boards[k])
+            reward += util.getScore(self.boards[k]) - prevScore
+            if util.isEnd(self.boards[k]):
+                done = True
+            observation += util.bitToBoard(self.boards[k]).flatten().tolist()
+
+        self.score += (reward / self.n)
 
         return np.asarray([observation]), reward, done, dict()
     
     def _reset(self):
         """Reset the board to begin a new game. Places two random tiles on the board."""
-        self.boards = [Game_2048() for _ in range(self.n)]
+        self.boards = [util.newBoard() for _ in range(self.n)]
         self.score = 0
         self.legalMoves = set()
         observation = []
         for k in range(self.n):
-            observation += self.boards[k].board.flatten().tolist()
+            observation += util.bitToBoard(self.boards[k]).flatten().tolist()
         return np.array([observation])
     
     def _render(self, mode='human', close=False):
@@ -66,24 +77,25 @@ class MultiGame2048Env(gym.Env):
         outfile = StringIO() if mode == 'ansi' else sys.stdout
         s = 'Score: {}\n'.format(self.score)
         for board in self.boards:
-            s += "{}\n\n".format(board.board)
+            s += "{}\n\n".format(util.bitToBoard(board))
         outfile.write(s)
         return outfile
-    
+
     ############### Non-OpenAI Gym functions ###############
-    
+
     def updateScore(self):
-        self.score = sum(self.boards[k].score for k in range(self.n)) / float(self.n)
+        self.score = sum(util.getScore(self.boards[k]) for k in range(self.n)) / float(self.n)
 
     def updateLegalMoves(self):
-        legalMoves = self.boards[0].legalMoves
+        legalMoves = util.getLegalMoves(self.boards[0])
         for k in range(1, self.n):
-            legalMoves = set.union(legalMoves, self.boards[k].legalMoves)
+            legalMoves = set.union(legalMoves, util.getLegalMoves(self.boards[k]))
         self.legalMoves = legalMoves
 
     def isEnd(self):
         for k in range(self.n):
-            if self.boards[k].isEnd(): return True
+            if util.isEnd(self.boards[k]): 
+                return True
         return False
 
     def getScore(self):
@@ -94,228 +106,3 @@ class MultiGame2048Env(gym.Env):
         self.updateLegalMoves()
         return self.legalMoves
 
-    def swipe(self, swipe):
-        for k in range(self.n):
-            self.boards[k].swipe(swipe)
-
-    def updateBoard(self):
-        for k in range(self.n):
-            self.boards[k].placeRandomTile()
-            self.boards[k].printScore()
-            self.boards[k].printBoard()
-
-'''
-======================
-       Game_2048
-======================
-'''
-
-class Game_2048:
-    '''
-    Creates a game of 2048.
-    Access self.board in the same way as a matrix, i.e. self.board[row][col].
-    '''
-
-    def __init__(self):
-        self.size = 4
-        self.board = np.zeros((self.size, self.size))
-        self.score = 0
-        self.options = range(0, 4)
-        self.legalMoves = set()
-        self.placeRandomTile()
-
-    '''
-    -----------------
-    UTILITY FUNCTIONS
-    -----------------
-    '''
-
-    def placeRandomTile(self):
-        if self.countZeros() == 0: return
-        empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if self.board[row, col] == 0]
-        tileval = 4 if random.random() > 0.8 else 2  # assuming a 4:1 distribution ratio
-        row, col = random.choice(empty_pos)
-        self.board[row, col] = tileval
-
-    def getLegalMoves(self):
-        self.legalMoves = set()
-        if self.countZeros() > 0:
-            for row in range(self.size):
-                for col in range(self.size):
-                    if self.board[row, col] == 0:
-                        def checkNeighbors(self, row, col):
-                            if row - 1 in range(self.size) and self.board[row - 1, col] > 0:
-                                self.legalMoves.add(2)
-                            if row + 1 in range(self.size) and self.board[row + 1, col] > 0:
-                                self.legalMoves.add(0)
-                            if col - 1 in range(self.size) and self.board[row, col - 1] > 0:
-                                self.legalMoves.add(1)
-                            if col + 1 in range(self.size) and self.board[row, col + 1] > 0:
-                                self.legalMoves.add(3)
-                        checkNeighbors(self, row, col)
-
-        # Check for horizontal matches
-        for row in range(self.size):
-            for col in range(self.size - 1):
-                if self.board[row, col] == self.board[row, col + 1] != 0:
-                    self.legalMoves.update([1, 3])
-                    break
-
-        # Check for vertical matches
-        for row in range(self.size - 1):
-            for col in range(self.size):
-                if self.board[row, col] == self.board[row + 1, col] != 0:
-                    self.legalMoves.update([0, 2])
-                    break
-
-        return self.legalMoves
-
-    def isEnd(self):
-        return len(self.getLegalMoves()) == 0
-
-    def countZeros(self):
-        return np.count_nonzero(self.board == 0)
-        
-    def getHighest(self):
-        max = self.board[0,0]
-        for i in range(self.size):
-            for j in range(self.size):
-                if self.board[i,j] > max:
-                    max = self.board[i,j]
-        return max
-
-    '''
-    ----------------------
-    GAME RUNNING FUNCTIONS
-    ----------------------
-    ''' 
-
-    def swipeLeft(self):
-        for m in range(self.size):
-            row = self.board[m, :]
-            if sum(row) == 0: continue
-            row = row[row != 0]
-            rowlist = row.tolist()
-            for i in range(row.size - 1):
-                if rowlist[i] == rowlist[i + 1]:
-                    rowlist[i] *= 2
-                    self.score += rowlist[i]
-                    rowlist[i + 1] = 0
-            newrow = np.array([ x for x in rowlist if x!= 0])
-            self.board[m, :] = np.concatenate((newrow, np.zeros(self.size - newrow.size)))
-
-    def swipeRight(self):
-        for m in range(self.size):
-            row = self.board[m, :]
-            if sum(row) == 0: continue
-            row = row[row != 0]
-            rowlist = row.tolist()
-            for i in range(row.size - 1, 0, -1):
-                if rowlist[i] == rowlist[i - 1]:
-                    rowlist[i] *= 2
-                    self.score += rowlist[i]
-                    rowlist[i - 1] = 0
-            newrow = np.array([ x for x in rowlist if x!= 0])
-            self.board[m, :] = np.concatenate((np.zeros(self.size - newrow.size), newrow))
-
-    def swipeUp(self):
-        for m in range(self.size):
-            row = self.board[:, m]
-            if sum(row) == 0: continue
-            row = row[row != 0]
-            rowlist = row.tolist()
-            for i in range(row.size - 1):
-                if rowlist[i] == rowlist[i + 1]:
-                    rowlist[i] *= 2
-                    self.score += rowlist[i]
-                    rowlist[i + 1] = 0
-            newrow = np.array([ x for x in rowlist if x!= 0])
-            self.board[:, m] = np.concatenate((newrow, np.zeros(self.size - newrow.size)))
-
-    def swipeDown(self):
-        for m in range(self.size):
-            row = self.board[:, m]
-            if sum(row) == 0: continue
-            row = row[row != 0]
-            rowlist = row.tolist()
-            for i in range(row.size - 1, 0, -1):
-                if rowlist[i] == rowlist[i - 1]:
-                    rowlist[i] *= 2
-                    self.score += rowlist[i]
-                    rowlist[i - 1] = 0
-            newrow = np.array([ x for x in rowlist if x!= 0])
-            self.board[:, m] = np.concatenate((np.zeros(self.size - newrow.size), newrow))
-
-    def swipe(self, action):
-        if(action == 3):
-            self.swipeLeft()
-        elif(action == 0):
-            self.swipeUp()
-        elif(action == 1):
-            self.swipeRight()
-        else:
-            self.swipeDown()
-
-    """
-    '''
-    ---------------------
-    INTERACTION FUNCTIONS
-    ---------------------
-    '''
-    
-    # should return a list of new boards
-    def generateSuccessor(self, action):
-        pre_action = self.copy()
-        if(action == 'a'):
-            pre_action.swipeLeft()
-        elif(action == 'w'):
-            pre_action.swipeUp()
-        elif(action == 'd'):
-            pre_action.swipeRight()
-        else:
-            pre_action.swipeDown()
-        empty_pos = [(row, col) for row in range(self.size) for col in range(self.size) if pre_action.board[row, col] == 0]
-        post_actions = [copy.copy(pre_action) for i in range(len(empty_pos))]
-        for i in range(len(post_actions)):
-            row, col = empty_pos[i]
-            post_actions[i].placeTile(row, col)
-        return post_actions
-
-    
-
-    def copy(self):
-        return copy.deepcopy(self)
-
-    def getLegalMoves(self):
-        self.legalMoves = set()
-        if self.countZeros() > 0:
-            for row in range(self.size):
-                for col in range(self.size):
-                    if self.board[row, col] == 0:
-                        def checkNeighbors(self, row, col):
-                            if row - 1 in range(self.size) and self.board[row - 1, col] > 0:
-                                self.legalMoves.update('s')
-                            if row + 1 in range(self.size) and self.board[row + 1, col] > 0:
-                                self.legalMoves.update('w')
-                            if col - 1 in range(self.size) and self.board[row, col - 1] > 0:
-                                self.legalMoves.update('d')
-                            if col + 1 in range(self.size) and self.board[row, col + 1] > 0:
-                                self.legalMoves.update('a')
-                        checkNeighbors(self, row, col)
-
-        # Check for horizontal matches
-        for row in range(self.size):
-            for col in range(self.size - 1):
-                if self.board[row, col] == self.board[row, col + 1] != 0:
-                    self.legalMoves.update('a', 'd')
-                    break
-
-        # Check for vertical matches
-        for row in range(self.size - 1):
-            for col in range(self.size):
-                if self.board[row, col] == self.board[row + 1, col] != 0:
-                    self.legalMoves.update('s', 'w')
-                    break
-
-        return self.legalMoves
-    """

@@ -3,9 +3,17 @@ import numpy as np
 import random
 import tensorflow as tf
 import Multi_Game_2048.Multi_Game_2048_env
+<<<<<<< HEAD
 import expectimax.player as pl
 import collections, random, operator
 import copy
+=======
+import player as pl
+import collections, random, operator
+import copy
+from Multi_Game_2048 import gameutil
+util = gameutil.gameutil()
+>>>>>>> ba95830c36bdf0d3e00608f70e093de393c4deed
 
 DISCOUNT = .9
 NUM_GAMES = 10000
@@ -30,7 +38,62 @@ loss = tf.reduce_sum(tf.square(nextQ - q_values))
 trainer = tf.train.GradientDescentOptimizer(learning_rate=0.01)
 updateModel = trainer.minimize(loss)
 init = tf.initialize_all_variables()
+weights1 = [7,6,5,4,6,5,4,3,5,4,3,2,4,3,2,1]
+weights2 = [4,5,6,7,3,4,5,6,2,3,4,5,1,2,3,4]
+weights3 = [1,2,3,4,2,3,4,5,3,4,5,6,4,5,6,7]
+weights4 = [4,3,2,1,5,4,3,2,6,5,4,3,7,6,5,4]
 
+def evalFn(currentGameState, isEnd, score):
+        if isEnd:
+            return float('-inf')
+
+        def countZeros(board):
+            count = 0
+            for x in range(16):
+                i = 0xF << (4 * x)
+                if i & board == 0:
+                    count += 1
+            return count
+
+        def weightedGrid(board):
+            sum1 = 0.0
+            sum2 = 0.0
+            sum3 = 0.0
+            sum4 = 0.0
+            for i in range(16):
+                val = 1 << ((board >> (4 * i)) & 0xF)
+                if val > 1:
+                    sum1 += weights1[i] * val
+                    sum2 += weights2[i] * val
+                    sum3 += weights3[i] * val
+                    sum4 += weights4[i] * val
+            return max(sum1, sum2, sum3, sum4)
+
+        ''' def monotonicity(cGS, k=10.0):
+
+            def monoEval(a, b, e=1.0):
+                # if a == b: b += 1  # make [ v ][ v ] the same as [ v ][ v+1 ]
+                if a == b: return 2 * k
+                return k / (np.log2(b / a) ** e)
+            sum = 0.0
+
+            for r in range(4):
+                forw = 0.0
+                back = 0.0
+                for k in range(3):
+                    forw += monoEval(cGS.board[r, k], cGS.board[r, k+1])
+                    back += monoEval(cGS.board[r, k+1], cGS.board[r, k])
+                sum += max(forw, back)
+
+            for c in range(4):
+                forw = 0.0
+                back = 0.0
+                for k in range(3):
+                    forw += monoEval(cGS.board[k, c], cGS.board[k+1, c])
+                    back += monoEval(cGS.board[k+1, c], cGS.board[k, c])
+                sum += max(forw, back)
+
+<<<<<<< HEAD
 weights1 = [range(i,i+4) for i in range(1,5)]
 weights2 = [range(i+3, i-1,-1) for i in range(1, 5)]
 weights3 = [range(i+3, i-1,-1) for i in range(4, 0,-1)]
@@ -90,12 +153,44 @@ def evalFn(currentGameState):
     eval += 50 * openTilePenalty(currentGameState)
 
     return eval
+=======
+            return sum '''
+
+        def openTilePenalty(board, n=5):
+            #return util.countZeros(board) - n
+            return -((util.countZeros(board) - n) ** 2)
+
+        def smoothness(board):
+            sm = 0.0
+            for r in range(4):
+                for k in range(3):
+                    sm += abs(util.getTile(board, 4 * r + k) - util.getTile(board, 4 * r + k + 1))
+
+            for c in range(4):
+                for k in range(3):
+                    sm += abs(util.getTile(board, 4 * k + c) - util.getTile(board, 4 * (k+1) + c))
+
+            return -sm  # penalize high disparity
+
+        eval = 0.0
+        eval += score
+        eval += weightedGrid(currentGameState)
+        #eval += monotonicity(currentGameState, k=10.0)
+        #eval += 10 * openTilePenalty(currentGameState)
+        eval += 2 * smoothness(currentGameState)
+
+        return eval
+>>>>>>> ba95830c36bdf0d3e00608f70e093de393c4deed
 
 saver = tf.train.Saver()
 with tf.Session() as sess:
     sess.run(init)
     tf.reset_default_graph()
+<<<<<<< HEAD
     agent = pl.Player(2, evalFn)
+=======
+    agent = pl.Player(2, evalFn, util, True)
+>>>>>>> ba95830c36bdf0d3e00608f70e093de393c4deed
     for i in range(NUM_GAMES):
         obs = env.reset()
         done = False
