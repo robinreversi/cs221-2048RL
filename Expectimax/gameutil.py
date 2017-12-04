@@ -130,12 +130,13 @@ class gameutil:
 
 
     def getTile(self, board, k):
-        return 1 << (0xF & (board >> (4 * k)))
+        x = 1 << (0xF & (board >> (4 * k)))
+        return x if x > 1 else 0
 
     def countZeros(self, board):
         count = 0
         for k in range(16):
-            count += (self.getTile(board, k) == 0.0)
+            count += int(self.getTile(board, k) == 0)
         return count
 
 
@@ -209,7 +210,7 @@ class gameutil:
         return highest
 
     def bitToBoard(self, board):
-        cboard = np.zeros(16)
+        cboard = np.zeros(16).astype(int)
         for k in range(16):
             cboard[k] = 1 << ((board >> (4 * k)) & 0xF)
             if cboard[k] == 1:
@@ -258,3 +259,16 @@ class gameutil:
         eval += 2 * self.smoothness(board)
 
         return eval
+
+    def direness(self, board):
+        return np.exp(-self.smoothness(board) / (self.countZeros(board) + .5))
+
+    def convertToText(self, action):
+        if(action == 0):
+            return 'Up'
+        elif(action == 1):
+            return 'Right'
+        elif(action == 2):
+            return 'Down'
+        else:
+            return 'Left'
