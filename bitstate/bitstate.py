@@ -11,7 +11,7 @@ class Game_2048:
         
     def __init__(self, board, tableL, tableR, scoreTable):
         self.size = 4
-        self.board = board
+        self.board = 1 << (4 * rand.randint(0,15))
         self.options = ['a', 's', 'd', 'w']
         self.randomize = False
         if tableL != None:
@@ -49,17 +49,17 @@ class Game_2048:
                             if rowlist[i] == rowlist[i + 1]:
                                 rowlist[i] += 1
                                 rowlist[i + 1] = 0
-                        newrowL = np.array(filter(lambda x: x != 0, rowlist))
-                        newrowL = np.concatenate((newrowL,np.zeros(self.size - newrowL.size))).tolist()
-                        newrowL = map(int, newrowL)
+                        newrowL = [x for x in rowlist if x != 0]
+                        newrowL = np.asarray(newrowL + np.zeros(self.size - len(newrowL)).tolist())
+                        newrowL = list(map(int, newrowL))
                         rowlist = rowR.tolist()
                         for i in range(rowR.size - 1, 0, -1):
                             if rowlist[i] == rowlist[i - 1]:
                                 rowlist[i] += 1
                                 rowlist[i - 1] = 0
-                        newrowR = np.array(filter(lambda x: x != 0, rowlist))
-                        newrowR = np.concatenate((np.zeros(self.size - newrowR.size),newrowR)).tolist()
-                        newrowR = map(int, newrowR)
+                        newrowR = [x for x in rowlist if x != 0]
+                        newrowR = np.asarray(np.zeros(self.size - len(newrowR)).tolist() + newrowR)
+                        newrowR = list(map(int, newrowR))
                         key = row[0] << 12 | row[1] << 8 | row[2] << 4 | row[3]
                         valL = newrowL[0] << 12 | newrowL[1] << 8 | newrowL[2] << 4 | newrowL[3]
                         valR = newrowR[0] << 12 | newrowR[1] << 8 | newrowR[2] << 4 | newrowR[3]
@@ -68,18 +68,14 @@ class Game_2048:
                         score = 0
                         for x in range(self.size):
                             val = row[x]
-                            score += (val - 1) * (1 << val)
+                            if val > 1:
+                                score += (val - 1) * (1 << val)
                         self.scoreTable[key] = score
                         
     
     def bitToBoard(self):
         board = np.zeros(self.size ** 2)
         for k in range(self.size ** 2):
-            '''
-<<<<<<< HEAD
-            board[k] = (self.board >> (4 * k)) & 0xF
-        board =board.reshape((self.size, self.size))
-        '''
             board[k] = 1 << ((self.board >> (4 * k)) & 0xF)
             if board[k] == 1:
                 board[k] = 0
@@ -101,7 +97,7 @@ class Game_2048:
     def emptyPos(self):
         lst = []
         for x in range(self.size ** 2):
-            i = 0xF << x
+            i = 0xF << (4 * x)
             if i & self.board == 0:
                 lst.append(x)
         return lst
@@ -129,7 +125,7 @@ class Game_2048:
         if self.randomize:  # turning this off for now
             tileval = 2 if random.random() > 0.8 else 1  # assuming a 4:1 distribution ratio
         else:
-            tileval = 2
+            tileval = 1
             
         id = random.choice(empty_pos)
         self.board += tileval << (4 * id)
@@ -174,12 +170,6 @@ class Game_2048:
     INTERACTION FUNCTIONS
     ---------------------
     '''
-    def getInput(self):
-        swipe = ''
-        while swipe not in self.options:
-            swipe = raw_input("Please enter a, s, d, w, or quit: ")
-            print('')
-        return swipe
 
     def getScore(self):
         '''
@@ -199,11 +189,11 @@ class Game_2048:
     # should return a list of new boards
     def generateSuccessor(self, action):
         pre_action = Game_2048(self.board, self.tableL, self.tableR, self.scoreTable)
-        if(action == 'a'):
+        if(action == 3):
             pre_action.swipeLeft()
-        elif(action == 'w'):
+        elif(action == 0):
             pre_action.swipeUp()
-        elif(action == 'd'):
+        elif(action == 1):
             pre_action.swipeRight()
         else:
             pre_action.swipeDown()
@@ -215,11 +205,11 @@ class Game_2048:
         return post_actions
 
     def swipe(self, action):
-        if(action == 'a'):
+        if(action == 3):
             self.swipeLeft()
-        elif(action == 'w'):
+        elif(action == 0):
             self.swipeUp()
-        elif(action == 'd'):
+        elif(action == 1):
             self.swipeRight()
         else:
             self.swipeDown()
@@ -252,7 +242,14 @@ class Game_2048:
     def printScore(self):
         print('Current score is %d' % self.score)
 
-
+    def getHighest(self):
+        max = 0
+        for k in range(self.size ** 2):
+            val = 1 << ((self.board >> (4 * k)) & 0xF)
+            if val > 1:
+                if val > max:
+                    max = val
+        return max
 
 ############################################################
 

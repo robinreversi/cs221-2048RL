@@ -1,6 +1,7 @@
 import gym
 from gym import spaces
 from gym.utils import seeding
+import copy
 
 import numpy as np
 import random
@@ -43,9 +44,12 @@ class MultiGame2048Env(gym.Env):
         observation = []
         for k in range(self.n):
             prevScore = self.boards[k].score
+            prevBoard = self.boards[k].board
             self.boards[k].swipe(action)
+            after = self.boards[k].board
+            if sum(sum(prevBoard == after)) > 0:
+                self.boards[k].placeRandomTile()
             reward += self.boards[k].score - prevScore
-            self.boards[k].placeRandomTile()
             if self.boards[k].isEnd(): done = True
             observation += self.boards[k].board.flatten().tolist()
 
@@ -132,6 +136,9 @@ class Game_2048:
     UTILITY FUNCTIONS
     -----------------
     '''
+
+    def placeTile(self, row, col):
+        self.board[row][col] = 2
 
     def placeRandomTile(self):
         if self.countZeros() == 0: return
@@ -259,7 +266,7 @@ class Game_2048:
         else:
             self.swipeDown()
 
-    """
+
     '''
     ---------------------
     INTERACTION FUNCTIONS
@@ -269,11 +276,11 @@ class Game_2048:
     # should return a list of new boards
     def generateSuccessor(self, action):
         pre_action = self.copy()
-        if(action == 'a'):
+        if(action == 3):
             pre_action.swipeLeft()
-        elif(action == 'w'):
+        elif(action == 0):
             pre_action.swipeUp()
-        elif(action == 'd'):
+        elif(action == 1):
             pre_action.swipeRight()
         else:
             pre_action.swipeDown()
@@ -284,41 +291,9 @@ class Game_2048:
             post_actions[i].placeTile(row, col)
         return post_actions
 
-    
+
 
     def copy(self):
         return copy.deepcopy(self)
 
-    def getLegalMoves(self):
-        self.legalMoves = set()
-        if self.countZeros() > 0:
-            for row in range(self.size):
-                for col in range(self.size):
-                    if self.board[row, col] == 0:
-                        def checkNeighbors(self, row, col):
-                            if row - 1 in range(self.size) and self.board[row - 1, col] > 0:
-                                self.legalMoves.update('s')
-                            if row + 1 in range(self.size) and self.board[row + 1, col] > 0:
-                                self.legalMoves.update('w')
-                            if col - 1 in range(self.size) and self.board[row, col - 1] > 0:
-                                self.legalMoves.update('d')
-                            if col + 1 in range(self.size) and self.board[row, col + 1] > 0:
-                                self.legalMoves.update('a')
-                        checkNeighbors(self, row, col)
 
-        # Check for horizontal matches
-        for row in range(self.size):
-            for col in range(self.size - 1):
-                if self.board[row, col] == self.board[row, col + 1] != 0:
-                    self.legalMoves.update('a', 'd')
-                    break
-
-        # Check for vertical matches
-        for row in range(self.size - 1):
-            for col in range(self.size):
-                if self.board[row, col] == self.board[row + 1, col] != 0:
-                    self.legalMoves.update('s', 'w')
-                    break
-
-        return self.legalMoves
-    """
