@@ -2,6 +2,7 @@ import gym
 import numpy as np
 import random
 import tensorflow as tf
+tf.reset_default_graph()
 import Multi_Game_2048.Multi_Game_2048_env
 <<<<<<< HEAD
 import expectimax.player as pl
@@ -15,21 +16,24 @@ from Multi_Game_2048 import gameutil
 util = gameutil.gameutil()
 >>>>>>> ba95830c36bdf0d3e00608f70e093de393c4deed
 
+
 DISCOUNT = .9
-NUM_GAMES = 10000
-epsilon = .2
+NUM_GAMES = 100
+epsilon = 0.1
 
 env = gym.make('Multi2048-v0')
 
 num_boards = env.n
-
 board_vals = tf.placeholder(shape=[1, 16 * num_boards],dtype=tf.float32)
-W1 = tf.Variable(tf.random_uniform([16 * num_boards, 16*num_boards], 0, 0.01))
-W2 = tf.Variable(tf.random_uniform([16 * num_boards, 16*num_boards], 0, 0.01))
-A2 = tf.nn.relu(tf.matmul(board_vals, W1))
-W3 = tf.Variable(tf.random_uniform([16 * num_boards, 4], 0, 0.01))
-A3 = tf.nn.relu(tf.matmul(A2, W2))
-q_values = tf.matmul(A3, W3)
+b1 = tf.Variable(tf.random_uniform([1, 16 * num_boards],0,1))
+b2 = tf.Variable(tf.random_uniform([1, 16 * num_boards],0,1))
+b3 = tf.Variable(tf.random_uniform([1, 4],0,1))
+W1 = tf.Variable(tf.random_uniform([16 * num_boards, 16*num_boards], 0, 1))
+W2 = tf.Variable(tf.random_uniform([16 * num_boards, 16*num_boards], 0, 1))
+A2 = tf.nn.relu(tf.add(tf.matmul(board_vals, W1),b1))
+W3 = tf.Variable(tf.random_uniform([16 * num_boards, 4], 0, 1))
+A3 = tf.nn.relu(tf.add(tf.matmul(A2, W2),b2))
+q_values = tf.add(tf.matmul(A3, W3),b3)
 action = tf.argmax(q_values,1)
 nextQ = tf.placeholder(shape=[1,4],dtype=tf.float32)
 
@@ -177,12 +181,13 @@ def evalFn(currentGameState):
         eval += weightedGrid(currentGameState)
         #eval += monotonicity(currentGameState, k=10.0)
         #eval += 10 * openTilePenalty(currentGameState)
-        eval += 2 * smoothness(currentGameState)
+        eval += smoothness(currentGameState)
 
         return eval
 >>>>>>> ba95830c36bdf0d3e00608f70e093de393c4deed
 
 saver = tf.train.Saver()
+<<<<<<< HEAD
 with tf.Session() as sess:
     sess.run(init)
     tf.reset_default_graph()
@@ -224,9 +229,66 @@ with tf.Session() as sess:
             print("AFTER ACTION")
             env.render()
         print("BOARD END")
+=======
+sess = tf.Session()
+
+saver.restore(sess, "./model/model.ckpt")
+#sess.run(init)
+agent = pl.Player(2, evalFn, util, True)
+scores = []
+for i in range(NUM_GAMES):
+    obs = env.reset()
+    done = False
+    while not done:
+        a, init_q_values = sess.run([action, q_values], feed_dict={board_vals:obs})
+        print(a)
+        print(init_q_values)
+        games = env.boards
+
+
+        legalMoves = list(env.getLegalMoves())
+        maxmov = 0
+        maxval = 0
+        for mov in legalMoves:
+            if init_q_values[0][mov] > maxval:
+                maxval = init_q_values[0][mov]
+                maxmov = mov
+        '''
+        values = collections.defaultdict(float)
+        count = collections.defaultdict(float)
+        for game in games:
+            f, vals = agent.getAction(copy.deepcopy(game))
+            for move, score in vals:
+                values[move] += score
+                count[move] += 1
+        for key in values:
+            values[move] /= count[move]
+        maxmov = max(values.items(), key=operator.itemgetter(1))[0]
+        '''
+        if(random.random() < epsilon):
+            maxmov = env.action_space.sample()
+
+        new_obs, reward, done, info = env.step(maxmov)
+        new_q_values = sess.run(q_values, feed_dict={board_vals:new_obs})
+
+        # V of the new state = max of the q values
+        max_new_q = np.max(new_q_values)
+        print(max_new_q)
+        targetQ = init_q_values
+        targetQ[0, a[0]] = reward + DISCOUNT * max_new_q
+        _ = sess.run([updateModel], feed_dict={board_vals: obs, nextQ: targetQ})
+
+        obs = new_obs
+        print("AFTER ACTION")
+        print('Iter: ', i)
+>>>>>>> 2d8ce898d62c69f2463a691364feb7c741578fe5
         env.render()
+    print("BOARD END")
+    env.render()
+    scores.append(env.getScore())
+    epsilon = 1./((i/50) + 10)
+print("Average Score: ", sum(scores)/float(len(scores)))
 
-        epsilon = 1./((i/50) + 10)
-
-    save_path = saver.save(sess, "/tmp/model.ckpt")
-    print("Model saved in file: %s" % save_path)
+save_path = saver.save(sess, "./model/model.ckpt")
+print("Model saved in file: %s" % save_path)
+sess.close()
