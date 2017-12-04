@@ -14,14 +14,10 @@ NUM_GAMES = 10
 def play2048(num_boards):
     games = [gamestate.Game_2048() for _ in range(num_boards)]
     # game = gamestate.Multi_Game_2048(4)
-    weights1 = [range(i,i+4) for i in xrange(1,5)]
-    weights2 = [range(i+3, i-1,-1) for i in xrange(1, 5)]
-    weights3 = [range(i+3, i-1,-1) for i in xrange(4, 0,-1)]
-    weights4 = [range(i, i + 4) for i in xrange(4, 0,-1)]
-    print weights1
-    print weights2
-    print weights3
-    print weights4
+    weights1 = [range(i,i+4) for i in range(1,5)]
+    weights2 = [range(i+3, i-1,-1) for i in range(1, 5)]
+    weights3 = [range(i+3, i-1,-1) for i in range(4, 0,-1)]
+    weights4 = [range(i, i + 4) for i in range(4, 0,-1)]
 
     def evalFn(currentGameState):
         if currentGameState.isEnd():
@@ -32,8 +28,8 @@ def play2048(num_boards):
             sum2 = 0.0
             sum3 = 0.0
             sum4 = 0.0
-            for i in xrange(4):
-                for j in xrange(4):
+            for i in range(4):
+                for j in range(4):
                     sum1 += weights1[i][j] * currentGameState.board[i, j]
                     sum2 += weights2[i][j] * currentGameState.board[i, j]
                     sum3 += weights3[i][j] * currentGameState.board[i, j]
@@ -48,18 +44,18 @@ def play2048(num_boards):
                 return k / (np.log2(b / a) ** e)
             sum = 0.0
 
-            for r in xrange(4):
+            for r in range(4):
                 forw = 0.0
                 back = 0.0
-                for k in xrange(3):
+                for k in range(3):
                     forw += monoEval(cGS.board[r, k], cGS.board[r, k+1])
                     back += monoEval(cGS.board[r, k+1], cGS.board[r, k])
                 sum += max(forw, back)
 
-            for c in xrange(4):
+            for c in range(4):
                 forw = 0.0
                 back = 0.0
-                for k in xrange(3):
+                for k in range(3):
                     forw += monoEval(cGS.board[k, c], cGS.board[k+1, c])
                     back += monoEval(cGS.board[k+1, c], cGS.board[k, c])
                 sum += max(forw, back)
@@ -91,7 +87,7 @@ def play2048(num_boards):
             action,vals = agent.getAction(game.copy())
             end = time.time()
             print("Time: ", end - start)
-            print "Action: " + str(action)
+            print("Action: " + str(action))
             for move,score in vals:
                 values[move] += score
                 count[move] += 1
