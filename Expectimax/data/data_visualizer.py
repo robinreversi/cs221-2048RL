@@ -1,6 +1,19 @@
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
+import pandas as pd
+import operator
+
+import math
+
+sns.set()
+sns.set_style("white")
+sns.set_context("talk")
+sns.set_palette(sns.color_palette(["blue", "orange", "orangered", "lightgreen"]))
+
+
+
 
 ALL_BOARDS = [1, 2, 3, 4, 5, 10, 50]
 METHODS = ['direness', 'simple', 'weighted', 'max']
@@ -32,7 +45,7 @@ def make_full_data_set():
 def get_acc_data(data):
     averages = []
     for i in ALL_BOARDS:
-        averages.append(data[str(i)][3])
+        averages.append(math.log(data[str(i)][3]))
     return averages
 
 
@@ -54,13 +67,6 @@ full
 
 full_data_set = make_full_data_set()
 
-print(full_data_set['weighted_fill']['1'][3])
-
-print(full_data_set['simple_fill']['1'][3])
-print(full_data_set['max_fill']['1'][3])
-
-
-
 def plot_data(fill):
     averages = {}
     for method in METHODS:
@@ -72,7 +78,7 @@ def plot_data(fill):
             averages[method + '_sample'] = sample
     
     fig, ax = plt.subplots()
-    width = .1
+    width = .15
     num_boards = len(ALL_BOARDS)
 
     def autolabel(rects):
@@ -90,23 +96,48 @@ def plot_data(fill):
 
     for i, method in enumerate(METHODS):
         if(fill):
-            name = method + '_fill'
-            plot = ax.bar(np.arange(num_boards) + i * width, averages[name], width, label=method+"_fill")
+            plot = ax.bar(np.arange(num_boards) + i * width, averages[method + '_fill'], width, label=method)
             all_plots.append(plot)
-            names.append(name)
+            names.append(method)
             #autolabel(plot)
         else:
-            name = method + '_sample'
-            plot = ax.bar(np.arange(num_boards) + i * width, averages[method + '_sample'], width, label=method+"_sample")
+            plot = ax.bar(np.arange(num_boards) + i * width, averages[method + '_sample'], width, label=method)
             all_plots.append(plot)
-            names.append(name)
+            names.append(method)
             #autolabel(plot)
 
     ax.set_xticklabels([0]+ALL_BOARDS)
     ax.legend(all_plots, names)
+    word = "Fill" if fill else "Sample"
+    title = "Log-Score vs Number of Boards using " + word + " Estimate"
+    ax.set_title(title)
+    ax.set_ylim(ymin=5.5)
+    ax.set_ylabel('Log-Score')
+    ax.set_xlabel('Number of Boards')
+
+
     plt.show()
 
 plot_data(1)
+plot_data(0)
+
+def table_data(fill):
+    key_word = 'fill' if fill else 'sample'
+    table = []
+    for method in METHODS:
+        method_data = full_data_set[method + '_' + key_word]
+        maxs = []
+        maxs.append(method)
+        for i in ALL_BOARDS:
+            max_values = method_data[str(i)][2]
+            maxs.append(max(max_values.items(), key=operator.itemgetter(0))[0])
+        table.append(maxs)
+    table = pd.DataFrame(table, columns=['method'] + ALL_BOARDS)
+    table.to_csv(key_word + '.csv')
+
+
+table_data(1)
+table_data(0)
 
 
 
