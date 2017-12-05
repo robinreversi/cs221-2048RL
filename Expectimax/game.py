@@ -14,7 +14,6 @@ import time
 
 METHODS = ['direness', 'simple', 'weighted', 'max']
 ALL_BOARDS = [3, 4, 5, 10, 50, 100]
-
 def printGames(games):
     for i in range(len(games)):
         print(util.bitToBoard(games[i]))
