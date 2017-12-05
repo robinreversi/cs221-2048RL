@@ -67,6 +67,9 @@ full
 
 full_data_set = make_full_data_set()
 
+print(full_data_set['weighted_sample']['1'][2])
+print(full_data_set['weighted_fill']['1'][2])
+
 def plot_data(fill):
     averages = {}
     for method in METHODS:

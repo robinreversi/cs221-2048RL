@@ -4,17 +4,11 @@ import random
 import tensorflow as tf
 tf.reset_default_graph()
 import Multi_Game_2048.Multi_Game_2048_env
-<<<<<<< HEAD
-import expectimax.player as pl
-import collections, random, operator
-import copy
-=======
 import player as pl
 import collections, random, operator
 import copy
 from Multi_Game_2048 import gameutil
 util = gameutil.gameutil()
->>>>>>> ba95830c36bdf0d3e00608f70e093de393c4deed
 
 
 DISCOUNT = .9
@@ -184,52 +178,7 @@ def evalFn(currentGameState):
         eval += smoothness(currentGameState)
 
         return eval
->>>>>>> ba95830c36bdf0d3e00608f70e093de393c4deed
 
-saver = tf.train.Saver()
-<<<<<<< HEAD
-with tf.Session() as sess:
-    sess.run(init)
-    tf.reset_default_graph()
-<<<<<<< HEAD
-    agent = pl.Player(2, evalFn)
-=======
-    agent = pl.Player(2, evalFn, util, True)
->>>>>>> ba95830c36bdf0d3e00608f70e093de393c4deed
-    for i in range(NUM_GAMES):
-        obs = env.reset()
-        done = False
-        while not done:
-            a, init_q_values = sess.run([action, q_values], feed_dict={board_vals:obs})
-            games = env.boards
-            values = collections.defaultdict(float)
-            count = collections.defaultdict(float)
-            for game in games:
-                f, vals = agent.getAction(copy.deepcopy(game))
-                for move, score in vals:
-                    values[move] += score
-                    count[move] += 1
-            for key in values:
-                values[move] /= count[move]
-            a[0] = max(values.items(), key=operator.itemgetter(1))[0]
-            if(random.random() < epsilon):
-                a[0] = env.action_space.sample()
-
-            new_obs, reward, done, info = env.step(a[0])
-
-            new_q_values = sess.run(q_values, feed_dict={board_vals:new_obs})
-
-            # V of the new state = max of the q values
-            max_new_q = np.max(new_q_values)
-            targetQ = init_q_values
-            targetQ[0, a[0]] = reward + DISCOUNT * max_new_q
-            _ = sess.run([updateModel], feed_dict={board_vals: obs, nextQ: targetQ})
-
-            obs = new_obs
-            print("AFTER ACTION")
-            env.render()
-        print("BOARD END")
-=======
 sess = tf.Session()
 
 saver.restore(sess, "./model/model.ckpt")
@@ -281,7 +230,6 @@ for i in range(NUM_GAMES):
         obs = new_obs
         print("AFTER ACTION")
         print('Iter: ', i)
->>>>>>> 2d8ce898d62c69f2463a691364feb7c741578fe5
         env.render()
     print("BOARD END")
     env.render()
