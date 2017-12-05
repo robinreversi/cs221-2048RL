@@ -119,7 +119,7 @@ def plot_data(fill):
     plt.show()
 
 plot_data(1)
-#plot_data(0)
+plot_data(0)
 
 def table_data(fill):
     key_word = 'fill' if fill else 'sample'
@@ -136,8 +136,8 @@ def table_data(fill):
     table.to_csv(key_word + '.csv')
 
 
-#table_data(1)
-#table_data(0)
+table_data(1)
+table_data(0)
 
 
 
