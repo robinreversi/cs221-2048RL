@@ -13,7 +13,7 @@ util = gameutil.gameutil()
 import time
 
 METHODS = ['direness', 'simple', 'weighted', 'max']
-ALL_BOARDS = [1, 2, 3, 4, 5, 10, 50, 100]
+ALL_BOARDS = [3, 4, 5, 10, 50, 100]
 
 def printGames(games):
     for i in range(len(games)):
