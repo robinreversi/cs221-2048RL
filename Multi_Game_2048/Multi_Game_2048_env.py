@@ -28,7 +28,7 @@ class MultiGame2048Env(gym.Env):
     metadata = {'render.modes': ['human', 'ansi']}
     def __init__(self):
 
-        self.n = 2
+        self.n = 4
         self.boards = [util.newBoard() for _ in range(self.n)]
         self.action_space = spaces.Discrete(4)
         self.observation_space = spaces.MultiDiscrete([range(16) for _ in range(self.n * 16)])
