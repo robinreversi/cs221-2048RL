@@ -200,12 +200,12 @@ class GameGrid(Frame):
         v.set("Score: 0")
         scorelbl = Frame(self, width = SIZE, height = 5)
         scorelbl.grid(column=0,row=2)
-        Label(master=scorelbl, textvariable=v, fg="#edc22e", justify=CENTER, font=FONT,width = 15, height=1).pack()
+        Label(master=scorelbl, textvariable=v, fg="#edc22e", justify=CENTER, font=FONT,width = 20, height=1).pack()
         x = StringVar()
         x.set("Best Score: 0")
         scorelbl2 = Frame(self, width=SIZE, height=5)
         scorelbl2.grid(column=1, row=2)
-        Label(master=scorelbl2, textvariable=x, fg="#edc22e", justify=CENTER, font=FONT, width=15, height=1).pack()
+        Label(master=scorelbl2, textvariable=x, fg="#edc22e", justify=CENTER, font=FONT, width=20, height=1).pack()
         self.score = v
         self.best = x
 
@@ -251,6 +251,7 @@ class GameGrid(Frame):
                 if curr > self.bestScore:
                     self.bestScore = curr
                     self.best.set("Best Score: " + str(curr))
+                time.sleep(1)
                 self.env.reset()
                 self.update_grid_cells()
                 self.update()
