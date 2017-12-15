@@ -39,8 +39,8 @@ class Player:
                     for i in range(len(newStates)):
                         lst = state_vals[i]
                         inds = np.argsort(lst)
-                        if len(inds) > 4:
-                            inds = inds[[0, 1, -1, -2]]
+                        #if len(inds) > 4:
+                        #    inds = inds[[0, 1, -1, -2]]
                         sample_states = [newStates[i][k] for k in inds]
                         potential_scores = [1.0 / len(sample_states) * V(newState, depth - 1, evalFn)[0] for newState in sample_states]
                         avg_score = sum(potential_scores)

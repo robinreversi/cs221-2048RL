@@ -128,36 +128,37 @@ def main(argv):
     args = parse_args(argv)
     depth = args.depth
     nboards = args.nboards
+    print nboards
     num_games = args.ngames
     method = args.method
     fill = args.fill
 
-    for num_boards in ALL_BOARDS:
-        print("-----------------------------------------")
-        print("EXECUTING " + str(num_boards) + " BOARDS")
-        scores = []
-        counter_max = collections.defaultdict(int)
-        counter_min = collections.defaultdict(int)
-        for i in range(num_games):
-            curr_score, min_highest_tile, max_highest_tile = play2048(num_boards, fill, method, depth)
-            scores.append(curr_score)
-            counter_max[max_highest_tile] += 1
-            counter_min[min_highest_tile] += 1
-        average = sum(scores) / float(num_games)
-        variance = sum([(score - average) ** 2 for score in scores])
+    #for num_boards in ALL_BOARDS:
+    #    print("-----------------------------------------")
+    #    print("EXECUTING " + str(num_boards) + " BOARDS")
+    scores = []
+    counter_max = collections.defaultdict(int)
+    counter_min = collections.defaultdict(int)
+    for i in range(num_games):
+        curr_score, min_highest_tile, max_highest_tile = play2048(nboards, fill, method, depth)
+        scores.append(curr_score)
+        counter_max[max_highest_tile] += 1
+        counter_min[min_highest_tile] += 1
+    average = sum(scores) / float(num_games)
+    variance = sum([(score - average) ** 2 for score in scores])
 
-        print("AVERAGE: ", average)
-        print("VARIANCE: ", variance)
-        print("min_highest_tile: ", counter_min)
-        print("max_highest_tile: ", counter_max)
+    print("AVERAGE: ", average)
+    print("VARIANCE: ", variance)
+    print("min_highest_tile: ", counter_min)
+    print("max_highest_tile: ", counter_max)
 
-        data = [scores, counter_min, counter_max, average, variance]
-        filename = 'd' + str(depth) + 'b' + str(num_boards) + 'g' + str(num_games) + 'f' + str(fill) + 'm' + str(method)
-        with open(filename, "wb") as f:
-            pickle.dump(data, f)
+    #data = [scores, counter_min, counter_max, average, variance]
+    #filename = 'd' + str(depth) + 'b' + str(nboards) + 'g' + str(num_games) + 'f' + str(fill) + 'm' + str(method)
+    #with open(filename, "wb") as f:
+    #        pickle.dump(data, f)
 
-        print("FINISHED EXECUTING " + str(num_boards) + " BOARDS")
-        print("-----------------------------------------")
+    #    print("FINISHED EXECUTING " + str(num_boards) + " BOARDS")
+    #    print("-----------------------------------------")
 
 if __name__ == '__main__':
     exit(main(sys.argv[1:]))
