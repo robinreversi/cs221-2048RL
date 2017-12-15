@@ -1,6 +1,5 @@
 # cs221-2048RL
 
-\section{Expectimax}
 To run Expectimax on multiple boards, cd to the Expectimax folder and run game.py with flags:
   -d = Depth for Expectimax, default=2, type=int
   -b = Number of boards to play on, default=2, type=int
@@ -11,7 +10,5 @@ To run Expectimax on multiple boards, cd to the Expectimax folder and run game.p
   
 All data used for graphs and tables are stored in Expectimax/data, and is stored in python3 picklized format.
 data_visualizer.py can be (internally) modified to output the tables or graphs shown in the final report
-
-\section{GUI}
 
 run puzzle.py to see our code run on a GUI with 4 boards!
