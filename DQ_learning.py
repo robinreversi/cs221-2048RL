@@ -4,11 +4,17 @@ import random
 import tensorflow as tf
 tf.reset_default_graph()
 import Multi_Game_2048.Multi_Game_2048_env
+<<<<<<< HEAD
+import expectimax.player as pl
+import collections, random, operator
+import copy
+=======
 import player as pl
 import collections, random, operator
 import copy
 from Multi_Game_2048 import gameutil
 util = gameutil.gameutil()
+>>>>>>> ba95830c36bdf0d3e00608f70e093de393c4deed
 
 
 DISCOUNT = .9
@@ -156,8 +162,7 @@ for i in range(NUM_GAMES):
         '''
         if(random.random() < epsilon):
             maxmov = env.action_space.sample()
-
-        new_obs, reward, done, info = env.step(maxmov)
+            new_obs, reward, done, info = env.step(maxmov)
         new_q_values = sess.run(q_values, feed_dict={board_vals:new_obs})
 
         # V of the new state = max of the q values
