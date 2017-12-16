@@ -1,4 +1,12 @@
-# cs221-2048RL
+# Artificial Intelligence Techniques for Playing Concurrent Games of 2048
+
+Stanford CS 221: Artificial Intelligence -- Final Project
+
+Alex Wang, Robin Cheong, Vince Ranganathan
+
+Updated 12/15/17
+
+----------------------------------------
 
 To run Expectimax on multiple boards, cd to the Expectimax folder and run game.py with flags:  
 
