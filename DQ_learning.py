@@ -4,17 +4,12 @@ import random
 import tensorflow as tf
 tf.reset_default_graph()
 import Multi_Game_2048.Multi_Game_2048_env
-<<<<<<< HEAD
-import expectimax.player as pl
-import collections, random, operator
-import copy
-=======
+
 import player as pl
 import collections, random, operator
 import copy
 from Multi_Game_2048 import gameutil
 util = gameutil.gameutil()
->>>>>>> ba95830c36bdf0d3e00608f70e093de393c4deed
 
 
 DISCOUNT = .9
@@ -124,10 +119,8 @@ def evalFn(currentGameState, isEnd, score):
 
         return eval
 
-saver = tf.train.Saver()
 sess = tf.Session()
 
-saver.restore(sess, "./model/model.ckpt")
 #sess.run(init)
 agent = pl.Player(2, evalFn, util, True)
 scores = []
@@ -182,6 +175,4 @@ for i in range(NUM_GAMES):
     epsilon = 1./((i/50) + 10)
 print("Average Score: ", sum(scores)/float(len(scores)))
 
-save_path = saver.save(sess, "./model/model.ckpt")
-print("Model saved in file: %s" % save_path)
 sess.close()
