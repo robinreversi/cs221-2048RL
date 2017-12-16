@@ -121,10 +121,10 @@ def plot_data(fill):
 
     plt.show()
 
-plot_data(1)
-plot_data(0)
+#plot_data(1)
+#plot_data(0)
 
-def table_data(fill):
+def table_data(fill, mode):
     key_word = 'fill' if fill else 'sample'
     table = []
     for method in METHODS:
@@ -133,14 +133,16 @@ def table_data(fill):
         maxs.append(method)
         for i in ALL_BOARDS:
             max_values = method_data[str(i)][2]
-            maxs.append(max(max_values.items(), key=operator.itemgetter(0))[0])
+            print(max_values)
+            print(max(max_values.items(), key=operator.itemgetter(mode))[0])
+            maxs.append(max(max_values.items(), key=operator.itemgetter(mode))[0])
         table.append(maxs)
     table = pd.DataFrame(table, columns=['method'] + ALL_BOARDS)
-    table.to_csv(key_word + '.csv')
+    table.to_csv(key_word + '_mode.csv')
 
 
-table_data(1)
-table_data(0)
+table_data(1, 0)
+table_data(0, 0)
 
 
 
