@@ -1,10 +1,10 @@
 # Artificial Intelligence Techniques for Playing Concurrent Games of 2048
 
-Stanford CS 221: Artificial Intelligence -- Final Project
+Stanford CS 221: Artificial Intelligence -- Final Project (Autumn 2017-18)
 
 Alex Wang, Robin Cheong, Vince Ranganathan
 
-Updated 12/15/17
+Updated 12/21/18
 
 Poster available at: http://web.stanford.edu/class/cs221/2018/restricted/posters/robinc20/poster.pdf
 
