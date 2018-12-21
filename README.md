@@ -6,6 +6,10 @@ Alex Wang, Robin Cheong, Vince Ranganathan
 
 Updated 12/15/17
 
+Poster available at: http://web.stanford.edu/class/cs221/2018/restricted/posters/robinc20/poster.pdf
+
+Paper available at: https://drive.google.com/file/d/1Nlr24oJz7EglIGuhd2YSlQPAiO_6jK8Y/view?usp=sharing
+
 ----------------------------------------
 
 To run Expectimax on multiple boards, cd to the Expectimax folder and run game.py with flags:  
