@@ -10,6 +10,11 @@ Poster available at: http://web.stanford.edu/class/cs221/2018/restricted/posters
 
 Paper available at: https://drive.google.com/file/d/1Nlr24oJz7EglIGuhd2YSlQPAiO_6jK8Y/view?usp=sharing
 
+
+The aim of this project is to develop an algorithm to play _n_ concurrent games of 2048, where a single swipe is applied across all _n_ boards. We are interested in understanding how the strategy an agent learns in playing one game needs to change in order to play several of these games concurrently, since oftentimes the strategy for solving one instance of a problem does not generalize well to solving multiple instances of the problem.
+
+We model the problem as a Markov decision process, and implement our modified version of Expectiminimax (described in detail in the paper above) to make decisions that balance the efficiency in quality and time.
+
 ----------------------------------------
 
 To run Expectimax on multiple boards, cd to the Expectimax folder and run game.py with flags:  
